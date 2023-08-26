@@ -1,0 +1,46 @@
+{
+    "Fixed Setup":{
+        "EventPlaces" :[
+            "GNC Basement",
+            "Dadanagar Hall",
+            "Gigantic Hall",
+            "Sector 4 Community Hall"
+        ],
+        "Equipments" : []
+    },
+    "Portabl Setup": {
+        "EventPlaces" :[
+            "Niruma Samadhi",
+            "Sim city Club House",
+            "Sim City Lake",
+            "Dormattory Tarace",
+            "Sector 1 club house",
+            "Sector 3 AB Community Hall",
+            "Sector 4 Community Hall",
+            "Sector 4 Garba Ground",
+            "Sector 4 Tarace Garden",
+            "Sector 4 CD watching Room",
+            "Amba Business Park - Niruma plaza hall",
+            "Amba Business Park - Room number 440 (hall)",
+            "Other"
+        ],
+        "Equipments" : [
+            "Laptop & Projector (Lenovo(3) & Vivitek(1) + Black long VGA cable)",
+            "Laptop & Projector (Dell(2) + Dell(2) + LONG HDMI Cable - 1 (3 MTR)",
+            "Laptop & Projector (Dell(4) and Yoton(3)+ LONG HDMI Cable - 1 (5 MTR)",
+            "Laptop & Projector (HP(1) and Yoton(4) + White Long VGA Cable + Converter)",
+            "Pignos 1 - with 9 valt batteries",
+            "Pignos 2 - with AA batteries",
+            "Pignos 3 - with AA batteries",
+            "Crabtree",
+            "Extension Board no -1",
+            "Extension Board no -2",
+            "Extension Board no -3",
+            "Audio Cable 1",
+            "Long grey wire mic",
+            "GNV Event Sound system",
+            "Cordless receiver System 1",
+            "Other"
+        ]
+    }
+}

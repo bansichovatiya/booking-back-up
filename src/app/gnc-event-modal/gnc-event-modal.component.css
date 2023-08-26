@@ -1,0 +1,10 @@
+.modal-title{
+    text-transform: capitalize;
+}
+/* .input-group-text {
+    width: 150px !important;
+} */
+
+ng-multiselect-dropdown {
+    font-size: .875rem;
+}

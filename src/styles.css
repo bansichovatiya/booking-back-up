@@ -1,0 +1,74 @@
+@import "assets/css/bootstrap.min.css";
+@import "../node_modules/angular-calendar/css/angular-calendar.css";
+
+.glyphicon {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.glyphicon-chevron-left:before {
+    content: "\e079";
+}
+
+.glyphicon-chevron-right:before {
+    content: "\e080";
+}
+
+.dark-theme {
+    bg-dark-primary: #1f262d;
+    bg-dark-secondary: #394046;
+    bg-active: #2c343a;
+    text-color: #d5d6d7;
+    border-color: rgb(0 0 0 / 60%);
+    background-color: bg-dark-primary;
+    color: text-color;
+}
+
+
+@include cal-theme((bg-primary: $bg-dark-primary,
+        bg-secondary: $bg-dark-secondary,
+        weekend-color: indianred,
+        bg-active: $bg-active,
+        border-color: $border-color,
+        gray: $bg-dark-secondary,
+        today-bg: $bg-dark-secondary,
+        event-color-primary: $bg-dark-secondary,
+    )) .cal-month-view .cal-day-cell.cal-out-month .cal-day-number {
+    opacity: 0.15;
+}
+
+
+
+.card {
+    border-color: border-color;
+}
+
+.card-header {
+    background-color: bg-dark-secondary;
+}
+
+.card-body {
+    background-color: bg-dark-primary;
+}
+
+.nav-tabs {
+    border-bottom-color: border-color;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: bg-dark-primary;
+    color: text-color;
+    border-color: border-color;
+}
+
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link:focus {
+    border-color: border-color;
+}

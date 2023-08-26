@@ -1,0 +1,85 @@
+<div class="container-fluid">
+  <div class="row align-items-center text-center mt-3 mb-2 booking">
+
+    <div class="col-md-4 col-lg-3">
+      <h4>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h4>
+    </div>
+
+    <div class="col-md-2 col-lg-1 justify-content-md-end">
+      <div class="btn-group">
+        <div class="btn btn-sm btn-outline-secondary" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate">
+          ❮
+        </div>
+        <div class="btn btn-sm btn-outline-secondary" mwlCalendarToday [(viewDate)]="viewDate">
+          Today
+        </div>
+        <div class="btn btn-sm btn-outline-secondary" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate">
+          ❯
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-lg-2 offset-lg-3">
+      <div class="btn-group" role="group">
+        <div class="btn btn-sm btn-outline-secondary" (click)="setView(CalendarView.Month)"
+          [class.active]="view === CalendarView.Month">
+          Month
+        </div>
+        <div class="btn btn-sm btn-outline-secondary" (click)="setView(CalendarView.Week)"
+          [class.active]="view === CalendarView.Week">
+          Week
+        </div>
+        <div class="btn btn-sm btn-outline-secondary" (click)="setView(CalendarView.Day)"
+          [class.active]="view === CalendarView.Day">
+          Day
+        </div>
+        <div style="cursor: pointer;" (click)="exportData()">
+          <img src="assets/image/export.png" />
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-lg-3">
+      <div class="input-group input-group-sm" aria-required="true">
+        <select class="form-select typedd" [(ngModel)]="selectedType" (change)="OnTypeChange($event.target.value)"
+          required required>
+          <option *ngFor="let item of types" [value]="item.Type">{{item.Type}}</option>
+        </select>
+        <select class="form-select" [(ngModel)]="selectedName" (change)="onChange($event.target.value)" required
+          required>
+          <option *ngFor="let item of eventTypes" [value]="item.Name">{{item.Name}}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <div class="row text-center">
+      <div class="col-md-4">
+        <ngb-alert #selfClosingAlert *ngIf="message" [type]="messageType" (closed)="message = ''">
+          {{ message }}
+        </ngb-alert>
+      </div>
+    </div>
+  </div>
+
+  <div [ngSwitch]="view">
+    <div class="week-view-container" style="overflow-x: auto;">
+      <mwl-calendar-month-view #monthView (dayClicked)="dayClicked($event.day)" *ngSwitchCase="CalendarView.Month"
+        [viewDate]="viewDate" [events]="events" [refresh]="refresh" (eventClicked)="eventClicked($event)"
+        (eventTimesChanged)="eventTimesChanged($event)">
+      </mwl-calendar-month-view>
+      <mwl-calendar-week-view #weekView *ngSwitchCase="CalendarView.Week" [viewDate]="viewDate" [events]="events"
+        [refresh]="refresh" (eventClicked)="eventClicked($event)"
+        [validateEventTimesChanged]="validateEventTimesChanged" (dayHeaderClicked)="dayClicked($event.day)"
+        (hourSegmentClicked)="hourSegmentClicked($event.date)" (eventTimesChanged)="eventTimesChanged($event)"
+        [dayStartHour]="starthour" [dayEndHour]="24">
+      </mwl-calendar-week-view>
+    </div>
+    <mwl-calendar-day-view *ngSwitchCase="CalendarView.Day" [viewDate]="viewDate" [events]="events" [refresh]="refresh"
+      (eventClicked)="eventClicked($event)" [validateEventTimesChanged]="validateEventTimesChanged" [hourSegments]="2"
+      (hourSegmentClicked)="hourSegmentClicked($event.date)" (eventTimesChanged)="eventTimesChanged($event)"
+      [dayStartHour]="starthour" [dayEndHour]="24">
+    </mwl-calendar-day-view>
+  </div>
+</div>
+<div class="mb-5"></div>

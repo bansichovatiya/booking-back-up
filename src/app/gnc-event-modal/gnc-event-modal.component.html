@@ -1,0 +1,117 @@
+<div class="modal-dialog modal-dialog-scrollable" style="margin: 0;">
+    <div class="modal-content">
+    <div class="modal-header" >
+        <h4 class="modal-title" id="modal-basic-title">{{action}}</h4>
+        <button type="button" class="btn-close close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="validationmsg" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span id="alertMsg">{{validationmsg}}</span>
+            <button (click)="clearErrors()" class="btn-close close" data-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="input-group input-group-sm btn-group btn-group-sm mb-3" role="group">
+            <label for="exampleFormControlInput1" class="input-group-text">Tatkal Booking*</label>
+            
+            <input type="radio" class="btn-check" name="btnradio" id="OnlyLaptop" value="Only Laptop" [(ngModel)]="event.meta.tatkalBookingType" autocomplete="off" [disabled]="action == 'view' || action == 'edit'">
+            <label class="btn btn-outline-secondary" for="OnlyLaptop">Only Laptop</label>
+            
+            <input type="radio" class="btn-check" name="btnradio" id="OnlyHall" value="Only Hall" autocomplete="off" [(ngModel)]="event.meta.tatkalBookingType" [disabled]="action == 'view' || action == 'edit'">
+            <label class="btn btn-outline-secondary" for="OnlyHall">Only Hall</label>
+            
+            <input type="radio" class="btn-check" name="btnradio" id="MhtBooking" value="Mht Booking" autocomplete="off" [(ngModel)]="event.meta.tatkalBookingType" [disabled]="action == 'view' || action == 'edit'">
+            <label class="btn btn-outline-secondary" for="MhtBooking">Mht Booking</label>
+        </div>
+        <ng-container *ngIf="event.meta.tatkalBookingType != null">
+            <div class="input-group input-group-sm mb-3">
+                <label for="eventTitle" class="input-group-text">Name*</label>
+                <input type="text" required class="form-control" id="eventTitle" [(ngModel)]="event.title" [disabled]="action == 'view'">
+            </div>
+            <div class="input-group input-group-sm mb-3">
+                <label class="input-group-text" aria-required="true">Pick up date*</label>
+                <input type="date" class="form-control" [value]="event.start | date:'yyyy-MM-dd'" (input)="event.start=parseDate($any($event.target).value)"  onkeydown="return false" (change)="filterPlaceAndEquimpents()" [disabled]="action == 'view'"/>
+            </div>
+            <div class="input-group input-group-sm mb-3">
+                <label class="input-group-text">Pick up time*</label>
+                <input type='time' required class="form-control" [(ngModel)]="startTime" (change)="filterPlaceAndEquimpents()" onkeydown="return false" [disabled]="action == 'view'"/>
+            </div>
+            <div class="input-group input-group-sm mb-3">
+                <label class="input-group-text"  aria-required="true">Return Date*</label>
+                <input type="date" class="form-control" [value]="event.end | date:'yyyy-MM-dd'" (input)="event.end=parseDate($any($event.target).value)" onkeydown="return false" (change)="filterPlaceAndEquimpents()" [disabled]="action == 'view'"/>
+            </div>
+            <div class="input-group input-group-sm mb-3">
+                <label class="input-group-text text-wrap" aria-required="true">Return time* (During office hours 11 AM to 7 PM)</label>
+                <input type='time' required class="form-control" [(ngModel)]="endTime" (change)="filterPlaceAndEquimpents()" onkeydown="return false" [disabled]="action == 'view'" />
+            </div>
+            <ng-container *ngIf="event.meta.tatkalBookingType == 'Mht Booking'">
+                <div class="input-group input-group-sm mb-3" aria-required="true">
+                    <label class="input-group-text">Set Up Required*</label>
+                    <select class="form-select" [(ngModel)]="event.meta.setUp" required (change)="onSetUpChanged()" [disabled]="action == 'view'">
+                        <option disabled selected value="">Select</option>
+                        <option *ngFor="let item of gncSetUpList" [value]="item">{{item}}</option>
+                    </select>
+                </div>
+                <div class="input-group input-group-sm mb-3" aria-required="true">
+                    <label class="input-group-text">Event Place*</label>
+                    <select class="form-select" [(ngModel)]="event.meta.eventPlace" required [disabled]="action == 'view'">
+                        <option disabled selected value="">Select</option>
+                        <option *ngFor="let item of eventPlaces" [value]="item">{{item}}</option>
+                    </select>
+                </div>
+                <div class="input-group input-group-sm mb-3" *ngIf="event.meta.setUp == gncSetUpList[1] && event.meta.eventPlace == 'Other'">
+                    <label for="otherPlace" class="input-group-text">Other Place*</label>
+                    <input type="text" required class="form-control" id="otherPlace" [(ngModel)]="event.meta.otherPlace" [disabled]="action == 'view'">
+                </div>
+                <div class="input-group input-group-sm mb-3" aria-required="true" *ngIf="event.meta.setUp == gncSetUpList[0]">
+                    <label class="input-group-text">Laptop*</label>
+                    <select class="form-select" [(ngModel)]="event.meta.laptop" required [disabled]="action == 'view'">
+                        <option disabled selected value="">Select</option>
+                        <option [value]=true>Yes</option>
+                        <option [value]=false>No</option>
+                    </select>
+                </div>
+                <div class="input-group input-group-sm mb-3" *ngIf="event.meta.setUp == gncSetUpList[0]">
+                    <label for="otherRequirements" class="input-group-text">Any Other Requirements</label>
+                    <input type="text" required class="form-control" id="otherRequirements" [(ngModel)]="event.meta.otherRequirements" [disabled]="action == 'view'">
+                </div>
+                <div class="input-group-sm mb-3" aria-required="true" *ngIf="event.meta.setUp == gncSetUpList[1]">
+                    <label class="input-group-text">Requirement of Equipment*</label>
+                    <ng-multiselect-dropdown
+                        [placeholder]="'Select Equipments'"
+                        [data]="equipments"
+                        [(ngModel)]="event.meta.equipments"
+                        [settings]="equipmentsDropdownSettings"
+                        [disabled]="action == 'view'"></ng-multiselect-dropdown>
+                </div>
+                <div class="input-group input-group-sm mb-3" *ngIf="event.meta.setUp == gncSetUpList[1] && event.meta.equipments.includes('Other')">
+                    <label for="otherRequirements" class="input-group-text">Other Requirements*</label>
+                    <input type="text" required class="form-control" id="otherRequirements" [(ngModel)]="event.meta.otherRequirements" [disabled]="action == 'view'">
+                </div>
+                <div class="input-group input-group-sm mb-3">
+                    <label for="remarks" class="input-group-text">Remarks</label>
+                    <input type="text" required class="form-control" id="remarks" [(ngModel)]="event.meta.remarks" [disabled]="action == 'view'">
+                </div>
+            </ng-container>
+        </ng-container>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" *ngIf ="action == 'view' || action == 'edit'"(click)="passBack('duplicate')">Duplicate</button>
+        <button type="submit" class="btn btn-danger" *ngIf="action == 'edit'" (click)="openModel(deleteConfirmModel)">Delete</button>
+        <button type="submit" class="btn btn-success"  *ngIf ="action == 'add' || action == 'edit'"  (click)="passBack('save')">Save</button>
+    </div>
+    </div>
+</div>
+<ng-template #deleteConfirmModel let-modal>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Confirm</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="modal.dismiss()"></button>
+        </div>
+        <div class="modal-body">
+            Are you sure you want to delete?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="modal.close(true)">Yes</button>
+            <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">No</button>
+        </div>
+        </div>
+  </ng-template>

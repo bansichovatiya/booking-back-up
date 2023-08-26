@@ -1,0 +1,6 @@
+.modal-title{
+    text-transform: capitalize;
+}
+.input-group-text {
+    width: 95px !important;
+}

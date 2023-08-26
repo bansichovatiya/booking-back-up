@@ -1,0 +1,33 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{action}}</h4>
+    <button type="button" class="btn-close close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
+<div class="modal-body">
+    <div *ngIf="validationmsg" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span id="alertMsg">{{validationmsg}}</span>
+        <button (click)="clearErrors()" class="btn-close close" data-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div class="input-group input-group-sm mb-3">
+        <label for="exampleFormControlInput1" class="input-group-text">Name*</label>
+        <input type="text" required class="form-control" id="eventTitle" [(ngModel)]="event.title">
+    </div>
+    <div class="input-group input-group-sm mb-3">
+        <label class="input-group-text" for="datepicker-start">Start Time*</label>
+        <input type='time' required class="form-control" [(ngModel)]="startTime" />
+    </div>
+    <div class="input-group input-group-sm mb-3">
+        <label class="input-group-text" for="datepicker-end" aria-required="true">End Time*</label>
+        <input type='time' required class="form-control" [(ngModel)]="endTime" />
+    </div>
+    <!-- <div class="input-group input-group-sm mb-3" aria-required="true">
+        <label class="input-group-text">Vehicle Name</label>
+        <select class="form-select" [(ngModel)]="event.meta.type" required>
+            <option disabled selected value="">Select</option>
+            <option *ngFor="let item of eventTypes" [value]="item.TypeName">{{item.TypeName}}</option>
+        </select>
+    </div> -->
+</div>
+<div class="modal-footer">
+    <button type="submit" class="btn btn-danger" *ngIf="action == 'edit'" (click)="passBack('delete')">Delete</button>
+    <button type="submit" class="btn btn-success"  *ngIf ="action == 'add' || action == 'edit'"  (click)="passBack('save')">Save</button>
+</div>
