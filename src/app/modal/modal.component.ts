@@ -58,7 +58,7 @@ export class ModalComponent implements OnInit {
             const eventid = this.event.id;
             const overlappingEvent = this.eventList.find((otherEvent) => {
               return (
-                otherEvent !== this.event && otherEvent.id != eventid && !otherEvent.allDay &&
+                otherEvent !== this.event && otherEvent.id != eventid &&
                 ((otherEvent.start < this.event.start && this.event.start < otherEvent.end) ||
                   (otherEvent.start < this.event.end && this.event.start < otherEvent.end)));
             });

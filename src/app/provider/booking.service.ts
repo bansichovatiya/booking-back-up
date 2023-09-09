@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { map } from 'rxjs/operators';
+import { EventData } from '../models/EventData';
 
 @Injectable({
   providedIn: 'root'
@@ -65,32 +66,22 @@ export class BookingService {
     )
   }
 
-  InsertGNCBookingDetails(name: string, stime: string, etime: string, itemid: string, otherData: any) {
-    let myParams = new HttpParams().set('name', name).set('stime', stime.toString()).set('etime', etime.toString()).set('itemid', itemid.toString())
-    .set('btype', otherData.tatkalBookingType).set('setup', otherData.setUp).set('eplace', otherData.eventPlace).set('oplace', otherData.otherPlace)
-    .set('equpiment', otherData.equipments.toString()).set('lpt', otherData.laptop.toString()).set('otherreq', otherData.otherRequirements).set('remarks', otherData.remarks);
-    // , string btype, string setup, string eplace, string oplace, string equpiment, string lpt, string otherreq, string remarks
-    
-    return this.http.get((this.apiUrl + 'insertgncbookingdetails'), { params: myParams }).pipe(map(data => {
+  InsertGNCBookingDetails(eventData: EventData) {
+   return this.http.post((this.apiUrl + 'insertgncbookingdetails'), eventData).pipe(map(data => {
       return data;
     })
     )
   }
 
-  UpdateGNCBookingDetails(name: string, stime: string, etime: string, itemid: string, bdid: string, otherData: any) {
-    let myParams = new HttpParams().set('name', name).set('stime', stime.toString()).set('etime', etime.toString()).set('itemid', itemid.toString()).set('bdid', bdid.toString())
-    .set('btype', otherData.tatkalBookingType).set('setup', otherData.setUp).set('eplace', otherData.eventPlace).set('oplace', otherData.otherPlace)
-    .set('equpiment', otherData.equipments.toString()).set('lpt', otherData.laptop.toString()).set('otherreq', otherData.otherRequirements).set('remarks', otherData.remarks);
-    // , string btype, string setup, string eplace, string oplace, string equpiment, string lpt, string otherreq, string remarks
-    return this.http.get((this.apiUrl + 'updategncbookingdetails'), { params: myParams }).pipe(map(data => {
+  UpdateGNCBookingDetails(eventData: EventData) {
+    return this.http.post((this.apiUrl + 'updategncbookingdetails'), eventData).pipe(map(data => {
       return data;
     })
     )
   }
 
-  DeleteGNCBookingDetails(bdid : string | number) {
-    let myParams = new HttpParams().set('bdid', bdid as string);
-    return this.http.get((this.apiUrl + 'deletegncbookingdetails'), { params: myParams }).pipe(map(data => {
+  DeleteGNCBookingDetails(eventData: EventData) {
+    return this.http.post((this.apiUrl + 'deletegncbookingdetails'), eventData).pipe(map(data => {
       return data;
     })
     )

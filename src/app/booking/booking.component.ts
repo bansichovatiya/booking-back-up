@@ -47,7 +47,7 @@ export class BookingComponent implements OnInit, OnDestroy {
   isrepeat: boolean = false;
   bookingDetails: any;
   daysInWeek = 7;
-  category: any = 'GNC';
+  category: any;
   starthour: any = 8;
   private destroy$ = new Subject<void>();
   @ViewChild('weekView') weekView: CalendarWeekViewComponent;
@@ -81,8 +81,8 @@ export class BookingComponent implements OnInit, OnDestroy {
   }
 
   async getBookingType() {
-    // let catParam = this.route.snapshot.routeConfig.path;
-    // this.category = ((catParam.includes('oldsankul') && catParam == '@oldsankul1958') ? 'Old Sankul' : (catParam.includes('newsankul') && catParam == '@newsankul1968') ? 'New Sankul' : 'All');
+    let catParam = this.route.snapshot.routeConfig.path;
+    this.category = ((catParam.includes('oldsankul') && catParam == '@oldsankul1958') ? 'Old Sankul' : (catParam.includes('newsankul') && catParam == '@newsankul1968') ? 'New Sankul' : 'All');
     await this.bookinService.GetBookingType('', this.category).subscribe((data) => {
       this.types = data;
       if (this.types.length > 0) {
@@ -174,6 +174,7 @@ export class BookingComponent implements OnInit, OnDestroy {
 
   hourSegmentClicked(date: Date) {
     let newEvent: CalendarEvent<{ ItemId: number }> = {
+      id: null,
       title: '',
       start: startOfMinute(date),
       end: addMinutes(startOfMinute(date), 30),

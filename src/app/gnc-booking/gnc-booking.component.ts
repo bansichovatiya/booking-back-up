@@ -14,6 +14,7 @@ import { CustomEventTitleFormatter } from '../provider/custom-event-title-format
 import { formatDate } from '@angular/common';
 import { IgxExcelExporterOptions, IgxExcelExporterService } from 'igniteui-angular';
 import { GncEventModalComponent } from '../gnc-event-modal/gnc-event-modal.component';
+import { EventData } from '../models/EventData';
 
 @Component({
   selector: 'app-gnc-booking',
@@ -109,178 +110,42 @@ export class GncBookingComponent implements OnInit, OnDestroy {
     // Required all events for filter event place and equipments in modal and to show by selected type from dropdown.
     
     let ItemId = this.eventTypes.find((t: { Name: any; }) => t.Name == this.selectedName).Itid;
-    // await this.bookinService.GetGNCBookingDetails(ItemId).subscribe((data) => {
-    //   this.bookingDetails = data;
-    //   if (this.bookingDetails.length > 0) {
-    //     this.bookingDetails.forEach((element) => {
-    //       let event: CalendarEvent<any> = {
-    //         id: element.bdid,
-    //         title: element.Person_Name,
-    //         start: moment(element.Stime, 'YYYY-MM-DDTHH:mm:ssZ').toDate(),
-    //         end: moment(element.Etime, 'YYYY-MM-DDTHH:mm:ssZ').toDate(),
-    //         color: Constants.getColorbyName(this.selectedColor),
-    //         meta: {
-    //           itemId: element.Itid,
-    //           tatkalBookingType: element.btype,
-    //           setUp: element.setup,
-    //           eventPlace: element.eplace,
-    //           otherPlace: element.oplace,
-    //           equipments: element.equpiment,
-    //           laptop: element.lpt,
-    //           otherRequirements: element.otherreq,
-    //           remarks: element.remarks,
-    //         },
-    //       }
-    //       this.events.push(event);
-    //     });
-    //   }
-    //   else {
-    //     this.events = [];
-    //   }
-    //   this.cd.detectChanges();
-    //   this.refresh.next();
-    // });
-    
-    // this.events = [
-    //   {
-    //     id: 1,
-    //     title: 'Title 1',
-    //     start: new Date(),
-    //     end: addHours(new Date(), 4),
-    //     color: Constants.colors['red'],
-    //     meta: 
-    //     {
-    //       itemId: 19,
-    //       tatkalBookingType: 'Mht Booking',
-    //       setUp: 'Fixed Setup',
-    //       eventPlace: 'GNC Basement',
-    //       otherPlace: '',
-    //       equipments: [],
-    //       laptop: true,
-    //       otherRequirements: 'otherRequirements',
-    //       remarks: '',
-    //     },
-    //   },
-    //   {
-    //     id: 2,
-    //     title: 'Title 2',
-    //     start: addHours(new Date(), 1),
-    //     end: addHours(new Date(), 8),
-    //     color: Constants.colors['yellow'],
-    //     meta: 
-    //     {
-    //       itemId: 20,
-    //       tatkalBookingType: 'Mht Booking',
-    //       setUp: 'Fixed Setup',
-    //       eventPlace: 'Dadanagar Hall',
-    //       otherPlace: '',
-    //       equipments: [],
-    //       laptop: true,
-    //       otherRequirements: 'otherRequirements',
-    //       remarks: '',
-    //     },
-    //   },
-    //   {
-    //     id: 3,
-    //     title: 'Title 3',
-    //     start: addHours(new Date(), 1),
-    //     end: addDays(new Date(), 2),
-    //     color: Constants.colors['blue'],
-    //     meta: 
-    //     {
-    //       itemId: 21,
-    //       tatkalBookingType: 'Mht Booking',
-    //       setUp: 'Portabl Setup',
-    //       eventPlace: 'Sector 1 club house',
-    //       otherPlace: '',
-    //       equipments: ['Laptop & Projector (Dell(2) + Dell(2) + LONG HDMI Cable - 1 (3 MTR)',
-    //                   'Pignos 3 - with AA batteries',
-    //                   'Crabtree',
-    //                   'Extension Board no -1', 'Other'],
-    //       laptop: null,
-    //       otherRequirements: 'otherRequirements',
-    //       remarks: '',
-    //     },
-    //   },
-    //   {
-    //     id: 4,
-    //     title: 'Title 4',
-    //     start: addHours(new Date(), 1),
-    //     end: addDays(new Date(), 1),
-    //     color: Constants.colors['green'],
-    //     meta: 
-    //     {
-    //       itemId: 22,
-    //       tatkalBookingType: 'Mht Booking',
-    //       setUp: 'Portabl Setup',
-    //       eventPlace: 'Other',
-    //       otherPlace: 'otherPlace',
-    //       equipments: ["Cordless receiver System 1"],
-    //       laptop: null,
-    //       otherRequirements: '',
-    //       remarks: '',
-    //     },
-    //   },
-    //   {
-    //     id: 5,
-    //     title: 'Title 5',
-    //     start: addHours(new Date(), 1),
-    //     end: addDays(new Date(), 1),
-    //     color: Constants.colors['pink'],
-    //     meta: 
-    //     {
-    //       itemId: 23,
-    //       tatkalBookingType: 'Mht Booking',
-    //       setUp: 'Fixed Setup',
-    //       eventPlace: 'Sector 4 Community Hall',
-    //       otherPlace: '',
-    //       equipments: [],
-    //       laptop: true,
-    //       otherRequirements: 'otherRequirements',
-    //       remarks: '',
-    //     },
-    //   },
-    //   {
-    //     id: 6,
-    //     title: 'Title 6',
-    //     start: addHours(new Date(), -2),
-    //     end: addHours(new Date(), -1),
-    //     color: Constants.colors['red'],
-    //     meta: 
-    //     {
-    //       itemId: 19,
-    //       tatkalBookingType: 'Mht Booking',
-    //       setUp: 'Fixed Setup',
-    //       eventPlace: 'GNC Basement',
-    //       otherPlace: '',
-    //       equipments: [],
-    //       laptop: true,
-    //       otherRequirements: 'otherRequirements',
-    //       remarks: '',
-    //     },
-    //   },
-    //   {
-    //     id: 7,
-    //     title: 'Title 7',
-    //     start: addHours(new Date(), 2),
-    //     end: addHours(new Date(), 3),
-    //     color: Constants.colors['orange'],
-    //     meta: 
-    //     {
-    //       itemId: 24,
-    //       tatkalBookingType: 'Only Laptop',
-    //       setUp: '',
-    //       eventPlace: '',
-    //       otherPlace: '',
-    //       equipments: [],
-    //       laptop: null,
-    //       otherRequirements: '',
-    //       remarks: '',
-    //     },
-    //   },
-    // ]
-
-    // this.eventsByItemId = this.events.filter(e => e.meta.itemId == ItemId);
+    await this.bookinService.GetGNCBookingDetails('0').subscribe((data) => {
+      console.info(data);
+      this.bookingDetails = data;
+      if (this.bookingDetails.length > 0) {
+        this.bookingDetails.forEach((element) => {
+          let equpiments: string[] = element.Equipments ? element.Equipments.split(',') : [];
+          let event: CalendarEvent<any> = {
+            id: element.bdid,
+            title: element.Person_Name,
+            start: moment(element.Stime, 'YYYY-MM-DDTHH:mm:ssZ').toDate(),
+            end: moment(element.Etime, 'YYYY-MM-DDTHH:mm:ssZ').toDate(),
+            color: Constants.getColorbyName(this.selectedColor),
+            meta: {
+              itemId: element.Itid,
+              bookingType: element.BookingType,
+              setUp: element.SetUp,
+              eventPlace: element.EventPlace,
+              otherPlace: element.OtherPlace,
+              equipments: equpiments,
+              laptop: element.Laptop,
+              otherRequirements: element.OtherRequirments,
+              remarks: element.Remarks,
+            },
+          }
+          this.events.push(event);
+        });
+        this.eventsByItemId = this.events.filter(e => e.meta.itemId == ItemId);
+      }
+      else {
+        this.events = [];
+        this.eventsByItemId = [];
+      }
+      this.cd.detectChanges();
+      this.refresh.next();
+    });
+   
   }
 
   setView(view: any) {
@@ -304,21 +169,21 @@ export class GncBookingComponent implements OnInit, OnDestroy {
 
   hourSegmentClicked(date: Date) {
     let newEvent: CalendarEvent<any> = {
-      id: undefined,
+      id: null,
       title: '',
       start: startOfMinute(date),
       end: addMinutes(startOfMinute(date), 30),
       color: Constants.getColorbyName(this.selectedColor),
       meta: {
         itemId: this.selectedItemId,
-        tatkalBookingType: null,
-        setUp: '',
-        eventPlace: '',
-        otherPlace: '',
+        bookingType: null,
+        setUp: null,
+        eventPlace: null,
+        otherPlace: null,
         equipments: [],
         laptop: null,
-        otherRequirements: '',
-        remarks: '',
+        otherRequirements: null,
+        remarks: null,
       },
     }
 
@@ -346,8 +211,8 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         this.eventsByItemId = this.eventsByItemId.filter((e) => e !== event);
         this.events = this.events.filter((e) => e !== event);
         if(event.id){
-          this.bookinService.DeleteGNCBookingDetails(
-            event.id)
+          let eventData = new EventData(result);
+          this.bookinService.DeleteGNCBookingDetails(eventData)
             .subscribe((data) => {
             });
         }
@@ -359,7 +224,13 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         this.openEventModal(duplicateEvent, 'add');
       }
       else if (result && action == 'add') {
-        result.id = this.events.length + 1;
+        let eventData = new EventData(result);
+        this.bookinService.InsertGNCBookingDetails(eventData)
+          .subscribe((data : EventData[]) => {
+            if(data && data.length > 0){
+              result.bdid = data[0].bdid;
+            }
+          });
         this.eventsByItemId = [
           ...this.eventsByItemId,
           result,
@@ -368,17 +239,6 @@ export class GncBookingComponent implements OnInit, OnDestroy {
           ...this.events,
           result,
         ];
-
-        let stime = moment(result.start).format('YYYY-MM-DD HH:mm:ss');
-        let etime = moment(result.end).format('YYYY-MM-DD HH:mm:ss');
-        this.bookinService.InsertGNCBookingDetails(
-          result.title,
-          stime,
-          etime,
-          result.meta.itemId,
-          result.meta)
-          .subscribe((data) => {
-          });
         this.refresh.next();
       }
       else if (result && action == 'edit') {
@@ -387,15 +247,8 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         event.end = result.end;
         event.meta = result.meta;
         this.refresh.next();
-        let stime = moment(result.start).format('YYYY-MM-DD HH:mm:ss');
-        let etime = moment(result.end).format('YYYY-MM-DD HH:mm:ss');
-        this.bookinService.UpdateGNCBookingDetails(
-          result.title,
-          stime,
-          etime,
-          result.meta.itemId,
-          result.id,
-          result.meta)
+        let eventData = new EventData(result);
+        this.bookinService.UpdateGNCBookingDetails(eventData)
           .subscribe((data) => {
           });
         this.refresh.next();
@@ -417,7 +270,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       });
       let event = {
         'Sr No': i,
-        'Type': element.meta.tatkalBookingType,
+        'Type': element.meta.bookingType,
         'Department': department,
         'Person Name': element.title,
         'Pick up Date': moment(element.start).format('DD-MM-YYYY hh:mm A'),

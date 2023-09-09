@@ -113,7 +113,7 @@
               <th scope="row"><button type="button" class="btn btn-secondary"
                   (click)="openEventModal(event, 'edit')">Edit</button></th>
               <th scope="row">{{ i + 1 }}</th>
-              <td>{{ event.meta.tatkalBookingType }}</td>
+              <td>{{ event.meta.bookingType }}</td>
               <td>{{ getDepartmentbyItemID(event.meta.itemId) }}</td>
               <td>{{ event.title }}</td>
               <td>{{ getFormatDateString(event.start) }}</td>

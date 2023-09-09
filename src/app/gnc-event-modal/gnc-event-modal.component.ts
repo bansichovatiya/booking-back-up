@@ -24,6 +24,7 @@ export class GncEventModalComponent implements OnInit {
   @Input()
   startHour!: number;
   validationmsg: any;
+  bookingTypeList: string[] = [ "Only Laptop", "Only Hall", "Mht Booking"];
   gncSetUpList: string[] = [ "Fixed Setup", "Portabl Setup"];
   jsonData: any = (data as any).default;
   eventPlaces: string[] = [];
@@ -44,16 +45,8 @@ export class GncEventModalComponent implements OnInit {
     this.endTime = (this.event.end.getHours().toString().length == 1 ? '0' + this.event.end.getHours() : this.event.end.getHours())
       + ':' + (this.event.end.getMinutes().toString().length == 1 ? '0' + this.event.end.getMinutes() : this.event.end.getMinutes());
     }
-    if(this.event.meta.setUp){
-      switch (this.event.meta.setUp) {
-        case this.gncSetUpList[0]:
-          this.eventPlaces = this.jsonData[this.gncSetUpList[0]]["EventPlaces"];
-          break;
-        case this.gncSetUpList[1]:
-          this.eventPlaces = this.jsonData[this.gncSetUpList[1]]["EventPlaces"];
-          this.equipments = this.jsonData[this.gncSetUpList[1]]["Equipments"];
-          break;
-      }
+
+    if(this.event.meta.bookingType){
       this.filterPlaceAndEquimpents();
     }
   }
@@ -63,24 +56,12 @@ export class GncEventModalComponent implements OnInit {
       case 'save':
         if(this.validateEvent()){
           // When all details is perfect.
-          if (this.event.meta.tatkalBookingType == "Mht Booking") {
+          if (this.event.meta.bookingType == "Mht Booking") {
             if(this.event.meta.eventPlace != "Other")
-              this.event.meta.otherPlace = '';
+              this.event.meta.otherPlace = null;
           if(this.event.meta.setUp == this.gncSetUpList[1] && !this.event.meta.equipments.includes("Other"))
-            this.event.meta.otherRequirements = '';
+            this.event.meta.otherRequirements = null;
           }
-          else if(this.action == 'add')
-          {
-            // Only laptop or hall type booking
-            this.event.meta.setUp = '';
-            this.event.meta.eventPlace = '';
-            this.event.meta.otherPlace = '';
-            this.event.meta.equipments = [];
-            this.event.meta.laptop = null,
-            this.event.meta.otherRequirements = '';
-            this.event.meta.remarks = '';
-          }
-
           this.activeModal.close(this.event);
         }
         break;
@@ -119,38 +100,61 @@ export class GncEventModalComponent implements OnInit {
       else if(!this.event.title) {
         this.showError('Name is missing.');
       }
-      else if (this.event.meta.tatkalBookingType == "Mht Booking") {
-        if (!this.event.meta.setUp) {
-          this.showError('Set up is missing.');
+      else {
+        let isValidData = false;
+        if (this.event.meta.bookingType == this.bookingTypeList[2]){
+          if (!this.event.meta.setUp) {
+            this.showError('Set up is missing.');
+          }
+          else if (!this.event.meta.eventPlace) {
+            this.showError('Event place is missing.');
+          }
+          else if (this.event.meta.eventPlace.includes('Other') && !this.event.meta.otherPlace) {
+            this.showError('Other place is missing.'); 
+          }
+          else if (this.event.meta.setUp == this.gncSetUpList[0] && !this.event.meta.laptop) {
+            this.showError('Pleas enter answer of Laptop field.'); 
+          }
+          else if (this.event.meta.setUp == this.gncSetUpList[1] && this.event.meta.equipments.length == 0) {
+            this.showError('Requirement of Equipment is missing.'); 
+          }
+          else if (this.event.meta.setUp == this.gncSetUpList[1] && this.event.meta.equipments.includes('Other') && !this.event.meta.otherRequirements) {
+            this.showError('Other Requirements is missing or unselect Other option from Equipments.'); 
+          }
+          else{
+            isValidData = true;
+          }
         }
-        else if (!this.event.meta.eventPlace) {
-          this.showError('Event place is missing.');
+        else if (this.event.meta.bookingType == this.bookingTypeList[1]){
+          if (!this.event.meta.eventPlace) {
+            this.showError('Event place is missing.');
+          }
+          else{
+            isValidData = true;
+          }
         }
-        else if (this.event.meta.eventPlace.includes('Other') && !this.event.meta.otherPlace) {
-          this.showError('Other place is missing.'); 
+        else if (this.event.meta.bookingType == this.bookingTypeList[0]){
+          if (this.event.meta.equipments.length == 0) {
+            this.showError('Requirement of Equipment is missing.');
+          }
+          else{
+            isValidData = true;
+          }
         }
-        else if (this.event.meta.setUp == this.gncSetUpList[0] && !this.event.meta.laptop) {
-          this.showError('Pleas enter answer of Laptop field.'); 
-        }
-        else if (this.event.meta.setUp == this.gncSetUpList[1] && this.event.meta.equipments.length == 0) {
-          this.showError('Requirement of Equipment is missing.'); 
-        }
-        else if (this.event.meta.setUp == this.gncSetUpList[1] && this.event.meta.equipments.includes('Other') && !this.event.meta.otherRequirements) {
-          this.showError('Other Requirements is missing or unselect Other option from Equipments.'); 
-        }
-        else{
+
+        if(isValidData){
           const eventid = this.event.id;
           const overlappingEvents = this.eventList.filter((otherEvent: CalendarEvent<any>) => {
             return (
-              otherEvent !== this.event && otherEvent.id != eventid && !otherEvent.allDay && otherEvent.end && this.event.end &&
+              otherEvent !== this.event && otherEvent.id != eventid && otherEvent.end && this.event.end &&
               ((otherEvent.start < this.event.start && this.event.start < otherEvent.end) ||
                 (otherEvent.start < this.event.end && this.event.start < otherEvent.end)));
           });
           if (overlappingEvents){
             let conflict = false;
             overlappingEvents.forEach(overlappingEvent => {
-              let conflictEventPlace = (overlappingEvent.meta.eventPlace == 'Other' && overlappingEvent.meta.otherPlace == this.event.meta.otherPlace) || (overlappingEvent.meta.eventPlace != 'Other' && overlappingEvent.meta.eventPlace == this.event.meta.eventPlace);
-              let conflictEquipments = overlappingEvent.meta.equipments.some((item: any) => (item != "Other" && this.event.meta.equipments.includes(item)));
+              let conflictEventPlace = (overlappingEvent.meta.eventPlace == 'Other' && overlappingEvent.meta.otherPlace == this.event.meta.otherPlace) || (overlappingEvent.meta.eventPlace != 'Other' && this.event.meta.eventPlace != null && overlappingEvent.meta.eventPlace == this.event.meta.eventPlace);
+              let conflictEquipments = this.event.meta.equipments.length > 0 && overlappingEvent.meta.equipments.some((item: any) => (item != "Other" && this.event.meta.equipments.includes(item)));
 
               if(conflictEventPlace && conflictEquipments){
                 conflict = true;
@@ -175,9 +179,6 @@ export class GncEventModalComponent implements OnInit {
           }
         }
       }
-      else {
-        return true;
-      }
     }
     else {
       this.showError('Pick up and Return date and time are missing.');
@@ -198,25 +199,43 @@ export class GncEventModalComponent implements OnInit {
   onSetUpChanged(){
     switch (this.event.meta.setUp) {
       case this.gncSetUpList[0]:
-        this.eventPlaces = this.jsonData[this.gncSetUpList[0]]["EventPlaces"];
-        this.event.meta.eventPlace = '';
-        this.event.meta.otherRequirements = '';
-        this.event.meta.otherPlace = '';
+        this.eventPlaces = this.jsonData[this.bookingTypeList[2]][this.gncSetUpList[0]]["EventPlaces"];
+        this.event.meta.eventPlace = null;
+        this.event.meta.otherRequirements = null;
+        this.event.meta.otherPlace = null;
         this.event.meta.equipments = [];
         break;
       case this.gncSetUpList[1]:
-        this.eventPlaces = this.jsonData[this.gncSetUpList[1]]["EventPlaces"];
-        this.equipments = this.jsonData[this.gncSetUpList[1]]["Equipments"];
+        this.eventPlaces = this.jsonData[this.bookingTypeList[2]][this.gncSetUpList[1]]["EventPlaces"];
+        this.equipments = this.jsonData[this.bookingTypeList[2]][this.gncSetUpList[1]]["Equipments"];
         this.event.meta.laptop = null;
-        this.event.meta.eventPlace = '';
-        this.event.meta.otherRequirements = '';
-        this.event.meta.otherPlace = '';
+        this.event.meta.eventPlace = null;
+        this.event.meta.otherRequirements = null;
+        this.event.meta.otherPlace = null;
         this.event.meta.equipments = [];
         break;
       default:
         this.eventPlaces = [];
         this.equipments = [];
         break;
+    }
+    this.filterPlaceAndEquimpents();
+  }
+
+  onBookingTypeChanged(){
+    // When type is not MHT booking
+    if(this.event.meta.bookingType != this.bookingTypeList[2])
+    {
+      this.eventPlaces = this.jsonData[this.event.meta.bookingType]["EventPlaces"];
+      this.equipments = this.jsonData[this.event.meta.bookingType]["Equipments"];
+      
+      // clear other data
+      this.event.meta.setUp = null;
+      this.event.meta.laptop = null;
+      this.event.meta.eventPlace = null;
+      this.event.meta.otherRequirements = null;
+      this.event.meta.otherPlace = null;
+      this.event.meta.equipments = [];
     }
     this.filterPlaceAndEquimpents();
   }
@@ -252,23 +271,30 @@ export class GncEventModalComponent implements OnInit {
         if (overlappingEvents)
         {
           if(this.event.meta.setUp){
-            this.eventPlaces = this.jsonData[this.event.meta.setUp]["EventPlaces"];
-            this.equipments = this.jsonData[this.event.meta.setUp]["Equipments"];
-
-            overlappingEvents.forEach(overlappingEvent => {
-              if(overlappingEvent.meta.eventPlace != 'Other')
-              {
-                this.eventPlaces = this.eventPlaces.filter(p => p != overlappingEvent.meta.eventPlace);
-              }
-              this.equipments = this.equipments.filter(p => overlappingEvent.meta.equipments.every((i: string) => (i == 'Other' || i != p)));
-            });
+            this.eventPlaces = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["EventPlaces"];
+            this.equipments = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["Equipments"];
           }
-          
+          else{
+            this.eventPlaces = this.jsonData[this.event.meta.bookingType]["EventPlaces"];
+            this.equipments = this.jsonData[this.event.meta.bookingType]["Equipments"];
+          }
+
+          overlappingEvents.forEach(overlappingEvent => {
+            if(overlappingEvent.meta.eventPlace != 'Other')
+            {
+              this.eventPlaces = this.eventPlaces.filter(p => p != overlappingEvent.meta.eventPlace);
+            }
+            this.equipments = this.equipments.filter(p => overlappingEvent.meta.equipments.every((i: string) => (i == 'Other' || i != p)));
+          });
         }
         else if(this.event.meta.setUp)
         {
           this.eventPlaces = this.jsonData[this.event.meta.setUp]["EventPlaces"];
           this.equipments = this.jsonData[this.event.meta.setUp]["Equipments"];
+        }
+        else{
+          this.eventPlaces = this.jsonData[this.event.meta.bookingType]["EventPlaces"];
+          this.equipments = this.jsonData[this.event.meta.bookingType]["Equipments"];
         }
       }
     }
