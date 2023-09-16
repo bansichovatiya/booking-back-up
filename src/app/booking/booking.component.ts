@@ -157,7 +157,6 @@ export class BookingComponent implements OnInit, OnDestroy {
   }
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent<{ ItemId: number }>[] }): void {
-    console.log(date);
     this.viewDate = date;
     this.view = CalendarView.Day;
   }

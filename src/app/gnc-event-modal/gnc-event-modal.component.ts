@@ -1,12 +1,14 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewEncapsulation } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarEvent } from 'angular-calendar';
 import * as moment from 'moment';
 import * as data from '../../assets/json/data.json';
+
 @Component({
   selector: 'app-gnc-event-modal',
   templateUrl: './gnc-event-modal.component.html',
-  styleUrls: ['./gnc-event-modal.component.css']
+  styleUrls: ['./gnc-event-modal.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 
 export class GncEventModalComponent implements OnInit {
@@ -24,8 +26,8 @@ export class GncEventModalComponent implements OnInit {
   @Input()
   startHour!: number;
   validationmsg: any;
-  bookingTypeList: string[] = [ "Only Laptop", "Only Hall", "Mht Booking"];
-  gncSetUpList: string[] = [ "Fixed Setup", "Portabl Setup"];
+  bookingTypeList: string[] = ["Only Laptop", "Only Hall", "Mht Booking"];
+  gncSetUpList: string[] = ["Fixed Setup", "Portabl Setup"];
   jsonData: any = (data as any).default;
   eventPlaces: string[] = [];
   equipments: string[] = [];
@@ -39,14 +41,14 @@ export class GncEventModalComponent implements OnInit {
       singleSelection: false,
       allowSearchFilter: true
     };
-    if(this.event.end){
+    if (this.event.end) {
       this.startTime = (this.event.start.getHours().toString().length == 1 ? '0' + this.event.start.getHours() : this.event.start.getHours())
-      + ':' + (this.event.start.getMinutes().toString().length == 1 ? '0' + this.event.start.getMinutes() : this.event.start.getMinutes());
-    this.endTime = (this.event.end.getHours().toString().length == 1 ? '0' + this.event.end.getHours() : this.event.end.getHours())
-      + ':' + (this.event.end.getMinutes().toString().length == 1 ? '0' + this.event.end.getMinutes() : this.event.end.getMinutes());
+        + ':' + (this.event.start.getMinutes().toString().length == 1 ? '0' + this.event.start.getMinutes() : this.event.start.getMinutes());
+      this.endTime = (this.event.end.getHours().toString().length == 1 ? '0' + this.event.end.getHours() : this.event.end.getHours())
+        + ':' + (this.event.end.getMinutes().toString().length == 1 ? '0' + this.event.end.getMinutes() : this.event.end.getMinutes());
     }
 
-    if(this.event.meta.bookingType){
+    if (this.event.meta.bookingType) {
       this.filterPlaceAndEquimpents();
     }
   }
@@ -54,13 +56,13 @@ export class GncEventModalComponent implements OnInit {
   passBack(action: string) {
     switch (action) {
       case 'save':
-        if(this.validateEvent()){
+        if (this.validateEvent()) {
           // When all details is perfect.
           if (this.event.meta.bookingType == "Mht Booking") {
-            if(this.event.meta.eventPlace != "Other")
+            if (this.event.meta.eventPlace != "Other")
               this.event.meta.otherPlace = null;
-          if(this.event.meta.setUp == this.gncSetUpList[1] && !this.event.meta.equipments.includes("Other"))
-            this.event.meta.otherRequirements = null;
+            if (this.event.meta.setUp == this.gncSetUpList[1] && !this.event.meta.equipments.includes("Other"))
+              this.event.meta.otherRequirements = null;
           }
           this.activeModal.close(this.event);
         }
@@ -76,11 +78,10 @@ export class GncEventModalComponent implements OnInit {
     }
   }
 
-  validateEvent(){
+  validateEvent() {
     let newStartTime = this.startTime.split(':');
     let newEndTime = this.endTime.split(':');
-    if (this.event.start && this.event.end)
-    {
+    if (this.event.start && this.event.end) {
       this.event.start.setHours(Number(newStartTime[0]), Number(newStartTime[1]), 0);
       this.event.end ? this.event.end.setHours(Number(newEndTime[0]), Number(newEndTime[1]), 0) : null;
       let compstarttime = moment(this.event.start, 'YYYY-MM-DDTHH:mm:ssZ').toDate();
@@ -88,21 +89,21 @@ export class GncEventModalComponent implements OnInit {
       let sthrime = moment(this.convertTimeToDateTime('0' + (this.startHour - 1) + ':59'), 'YYYY-MM-DDTHH:mm:ssZ').toDate();
       let curtime = moment().toDate();
       if (compstarttime <= sthrime) {
-        this.showError('Start time should be within time range.');
+        this.showError('Pick up time should be within time range.');
       }
       else if (compstarttime >= compendtime) {
         // if (compstarttime >= compendtime) {
-          this.showError('Start time is greater than end time or both are same.');
+        this.showError('Pick up time is greater than Return time or both are same.');
       }
       else if (compendtime <= curtime) {
         this.showError('Past times are not allowed');
       }
-      else if(!this.event.title) {
+      else if (!this.event.title) {
         this.showError('Name is missing.');
       }
       else {
         let isValidData = false;
-        if (this.event.meta.bookingType == this.bookingTypeList[2]){
+        if (this.event.meta.bookingType == this.bookingTypeList[2]) {
           if (!this.event.meta.setUp) {
             this.showError('Set up is missing.');
           }
@@ -110,39 +111,39 @@ export class GncEventModalComponent implements OnInit {
             this.showError('Event place is missing.');
           }
           else if (this.event.meta.eventPlace.includes('Other') && !this.event.meta.otherPlace) {
-            this.showError('Other place is missing.'); 
+            this.showError('Other place is missing.');
           }
           else if (this.event.meta.setUp == this.gncSetUpList[0] && !this.event.meta.laptop) {
-            this.showError('Pleas enter answer of Laptop field.'); 
+            this.showError('Pleas enter answer of Laptop field.');
           }
           else if (this.event.meta.setUp == this.gncSetUpList[1] && this.event.meta.equipments.length == 0) {
-            this.showError('Requirement of Equipment is missing.'); 
+            this.showError('Requirement of Equipment is missing.');
           }
           else if (this.event.meta.setUp == this.gncSetUpList[1] && this.event.meta.equipments.includes('Other') && !this.event.meta.otherRequirements) {
-            this.showError('Other Requirements is missing or unselect Other option from Equipments.'); 
+            this.showError('Other Requirements is missing or unselect Other option from Equipments.');
           }
-          else{
+          else {
             isValidData = true;
           }
         }
-        else if (this.event.meta.bookingType == this.bookingTypeList[1]){
+        else if (this.event.meta.bookingType == this.bookingTypeList[1]) {
           if (!this.event.meta.eventPlace) {
             this.showError('Event place is missing.');
           }
-          else{
+          else {
             isValidData = true;
           }
         }
-        else if (this.event.meta.bookingType == this.bookingTypeList[0]){
+        else if (this.event.meta.bookingType == this.bookingTypeList[0]) {
           if (this.event.meta.equipments.length == 0) {
             this.showError('Requirement of Equipment is missing.');
           }
-          else{
+          else {
             isValidData = true;
           }
         }
 
-        if(isValidData){
+        if (isValidData) {
           const eventid = this.event.id;
           const overlappingEvents = this.eventList.filter((otherEvent: CalendarEvent<any>) => {
             return (
@@ -150,31 +151,31 @@ export class GncEventModalComponent implements OnInit {
               ((otherEvent.start < this.event.start && this.event.start < otherEvent.end) ||
                 (otherEvent.start < this.event.end && this.event.start < otherEvent.end)));
           });
-          if (overlappingEvents){
+          if (overlappingEvents) {
             let conflict = false;
             overlappingEvents.forEach(overlappingEvent => {
               let conflictEventPlace = (overlappingEvent.meta.eventPlace == 'Other' && overlappingEvent.meta.otherPlace == this.event.meta.otherPlace) || (overlappingEvent.meta.eventPlace != 'Other' && this.event.meta.eventPlace != null && overlappingEvent.meta.eventPlace == this.event.meta.eventPlace);
               let conflictEquipments = this.event.meta.equipments.length > 0 && overlappingEvent.meta.equipments.some((item: any) => (item != "Other" && this.event.meta.equipments.includes(item)));
 
-              if(conflictEventPlace && conflictEquipments){
+              if (conflictEventPlace && conflictEquipments) {
                 conflict = true;
                 this.showError('Event place and equipments are conflicting with existing booking - ' + overlappingEvent.title);
               }
-              else if(conflictEventPlace){
+              else if (conflictEventPlace) {
                 conflict = true;
                 this.showError('Event place is conflicting with existing booking - ' + overlappingEvent.title);
               }
-              else if(conflictEquipments){
+              else if (conflictEquipments) {
                 conflict = true;
                 this.showError('Event equipments are conflicting with existing booking - ' + overlappingEvent.title);
               }
             });
 
-            if(!conflict)
+            if (!conflict)
               return true;
 
           }
-          else{
+          else {
             return true;
           }
         }
@@ -196,7 +197,7 @@ export class GncEventModalComponent implements OnInit {
     return dateTimeString;
   }
 
-  onSetUpChanged(){
+  onSetUpChanged() {
     switch (this.event.meta.setUp) {
       case this.gncSetUpList[0]:
         this.eventPlaces = this.jsonData[this.bookingTypeList[2]][this.gncSetUpList[0]]["EventPlaces"];
@@ -222,13 +223,12 @@ export class GncEventModalComponent implements OnInit {
     this.filterPlaceAndEquimpents();
   }
 
-  onBookingTypeChanged(){
+  onBookingTypeChanged() {
     // When type is not MHT booking
-    if(this.event.meta.bookingType != this.bookingTypeList[2])
-    {
+    if (this.event.meta.bookingType != this.bookingTypeList[2]) {
       this.eventPlaces = this.jsonData[this.event.meta.bookingType]["EventPlaces"];
       this.equipments = this.jsonData[this.event.meta.bookingType]["Equipments"];
-      
+
       // clear other data
       this.event.meta.setUp = null;
       this.event.meta.laptop = null;
@@ -240,73 +240,76 @@ export class GncEventModalComponent implements OnInit {
     this.filterPlaceAndEquimpents();
   }
 
-  filterPlaceAndEquimpents(){
+  filterPlaceAndEquimpents() {
     let newStartTime = this.startTime.split(':');
     let newEndTime = this.endTime.split(':');
     this.event.start.setHours(Number(newStartTime[0]), Number(newStartTime[1]), 0);
     this.event.end ? this.event.end.setHours(Number(newEndTime[0]), Number(newEndTime[1]), 0) : null;
     if (this.event.start && this.event.end) {
-      let compstarttime = moment(this.event.start, 'YYYY-MM-DDTHH:mm:ssZ').toDate();
-      let compendtime = moment(this.event.end, 'YYYY-MM-DDTHH:mm:ssZ').toDate();
-      let sthrime = moment(this.convertTimeToDateTime('0' + (this.startHour - 1) + ':59'), 'YYYY-MM-DDTHH:mm:ssZ').toDate();
-      let curtime = moment().toDate();
-      if (compstarttime <= sthrime) {
-        this.showError('Start time should be within time range.');
-      }
-      else if (compstarttime >= compendtime) {
-        // if (compstarttime >= compendtime) {
-          this.showError('Start time is greater than end time or both are same.');
-      }
-      else if (compendtime <= curtime) {
-        this.showError('Past times are not allowed');
-      }
-      else {
-        const eventid = this.event.id;
-        const overlappingEvents = this.eventList.filter((otherEvent: CalendarEvent<any>) => {
-          return (
-            otherEvent !== this.event && otherEvent.id != eventid && !otherEvent.allDay && otherEvent.end && this.event.end &&
-            ((otherEvent.start < this.event.start && this.event.start < otherEvent.end) ||
-              (otherEvent.start < this.event.end && this.event.start < otherEvent.end)));
-        });
-        if (overlappingEvents)
-        {
-          if(this.event.meta.setUp){
-            this.eventPlaces = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["EventPlaces"];
-            this.equipments = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["Equipments"];
-          }
-          else{
-            this.eventPlaces = this.jsonData[this.event.meta.bookingType]["EventPlaces"];
-            this.equipments = this.jsonData[this.event.meta.bookingType]["Equipments"];
-          }
-
-          overlappingEvents.forEach(overlappingEvent => {
-            if(overlappingEvent.meta.eventPlace != 'Other')
-            {
-              this.eventPlaces = this.eventPlaces.filter(p => p != overlappingEvent.meta.eventPlace);
-            }
-            this.equipments = this.equipments.filter(p => overlappingEvent.meta.equipments.every((i: string) => (i == 'Other' || i != p)));
-          });
+      // let compstarttime = moment(this.event.start, 'YYYY-MM-DDTHH:mm:ssZ').toDate();
+      // let compendtime = moment(this.event.end, 'YYYY-MM-DDTHH:mm:ssZ').toDate();
+      // let sthrime = moment(this.convertTimeToDateTime('0' + (this.startHour - 1) + ':59'), 'YYYY-MM-DDTHH:mm:ssZ').toDate();
+      // let curtime = moment().toDate();
+      // if (compstarttime <= sthrime) {
+      //   this.showError('Pick up time should be within time range.');
+      // }
+      // else if (compstarttime >= compendtime) {
+      //   // if (compstarttime >= compendtime) {
+      //   this.showError('Pick up time is greater than Return time or both are same.');
+      // }
+      // else if (compendtime <= curtime) {
+      //   this.showError('Past times are not allowed');
+      // }
+      const eventid = this.event.id;
+      const overlappingEvents = this.eventList.filter((otherEvent: CalendarEvent<any>) => {
+        return (
+          otherEvent !== this.event && otherEvent.id != eventid && !otherEvent.allDay && otherEvent.end && this.event.end &&
+          ((otherEvent.start < this.event.start && this.event.start < otherEvent.end) ||
+            (otherEvent.start < this.event.end && this.event.start < otherEvent.end)));
+      });
+      if (overlappingEvents) {
+        if (this.event.meta.setUp) {
+          this.eventPlaces = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["EventPlaces"];
+          this.equipments = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["Equipments"];
+          // if (this.eventPlaces) {
+          //   if (this.eventPlaces.length == 1)
+          //     this.event.meta.eventPlace = this.eventPlaces[0];
+          // }
         }
-        else if(this.event.meta.setUp)
-        {
-          this.eventPlaces = this.jsonData[this.event.meta.setUp]["EventPlaces"];
-          this.equipments = this.jsonData[this.event.meta.setUp]["Equipments"];
-        }
-        else{
+        else {
           this.eventPlaces = this.jsonData[this.event.meta.bookingType]["EventPlaces"];
           this.equipments = this.jsonData[this.event.meta.bookingType]["Equipments"];
+          if (this.eventPlaces) {
+            if (this.eventPlaces.length == 1)
+              this.event.meta.eventPlace = this.eventPlaces[0];
+          }
         }
+
+        overlappingEvents.forEach(overlappingEvent => {
+          if (overlappingEvent.meta.eventPlace != 'Other') {
+            this.eventPlaces = this.eventPlaces.filter(p => p != overlappingEvent.meta.eventPlace);
+          }
+          this.equipments = this.equipments.filter(p => overlappingEvent.meta.equipments.every((i: string) => (i == 'Other' || i != p)));
+        });
+      }
+      else if (this.event.meta.setUp) {
+        this.eventPlaces = this.jsonData[this.event.meta.setUp]["EventPlaces"];
+        this.equipments = this.jsonData[this.event.meta.setUp]["Equipments"];
+      }
+      else {
+        this.eventPlaces = this.jsonData[this.event.meta.bookingType]["EventPlaces"];
+        this.equipments = this.jsonData[this.event.meta.bookingType]["Equipments"];
       }
     }
   }
 
-  clearErrors(){
+  clearErrors() {
     this.validationmsg = '';
   }
 
   parseDate(dateString: string): Date {
     if (dateString) {
-        return new Date(dateString);
+      return new Date(dateString);
     }
     return new Date();
   }
@@ -314,14 +317,14 @@ export class GncEventModalComponent implements OnInit {
   showError(message: string) {
     this.validationmsg = message;
     let self = this;
-    setTimeout(function(){
+    setTimeout(function () {
       self.validationmsg = '';
     }, 5000);
   }
 
   openModel(content: any) {
     this.modalService.open(content).result.then((result) => {
-      if(result)
+      if (result)
         this.passBack('delete');
     }, (reason) => {
     });

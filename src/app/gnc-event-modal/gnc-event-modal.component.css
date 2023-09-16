@@ -1,10 +1,46 @@
-.modal-title{
+.modal-title {
     text-transform: capitalize;
 }
+
 /* .input-group-text {
     width: 150px !important;
 } */
 
 ng-multiselect-dropdown {
     font-size: .875rem;
+    position: relative;
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+}
+
+.btype {
+    background: none;
+    border: 0;
+    font-weight: bold;
+}
+
+.fmultiselect .multiselect-dropdown .dropdown-btn {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border: 1px solid #ced4da !important;
+    padding: .25rem .5rem !important;
+}
+
+.fmultiselect .multiselect-dropdown .dropdown-btn .dropdown-multiselect__caret:before {
+    margin-top: 4px !important;
+    border-width: 6px 6px 0 !important;
+    border-color: #615b5b transparent !important;
+}
+
+.fmultiselect .multiselect-dropdown .dropdown-btn .selected-item-container a {
+    float: right;
+}
+.fmultiselect .multiselect-dropdown .dropdown-btn .selected-item-container .selected-item{
+    font-size: 13px;
+}
+.gnote {
+    font-size: 12px;
+    margin-top: -15px;
+    margin-bottom: 8px;
 }

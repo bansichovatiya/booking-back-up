@@ -2,13 +2,12 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy, Chang
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarDateFormatter, CalendarEvent, CalendarEventTitleFormatter, CalendarMonthViewComponent, CalendarView, CalendarWeekViewComponent } from 'angular-calendar';
-import { addDays, addHours, addMinutes, startOfMinute } from 'date-fns';
+import { addMinutes, startOfMinute } from 'date-fns';
 import { Subject } from 'rxjs'
 import { Cloneable } from '../helper/cloneable';
 import { BookingService } from '../provider/booking.service';
 import * as moment from "moment";
 import { Constants } from '../helper/constants';
-import { EventColor } from 'calendar-utils';
 import { CustomDateFormatter } from '../provider/custom-date-formatter.provider';
 import { CustomEventTitleFormatter } from '../provider/custom-event-title-formatter.provider';
 import { formatDate } from '@angular/common';
@@ -40,7 +39,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
   events: CalendarEvent<any>[] = [];
   eventsByItemId: CalendarEvent<any>[] = [];
   refresh = new Subject<void>();
-
+  sortDirection = 'asc';
   selectedItemId: any;
   selectedName: any;
   selectedColor: any;
@@ -111,7 +110,6 @@ export class GncBookingComponent implements OnInit, OnDestroy {
     
     let ItemId = this.eventTypes.find((t: { Name: any; }) => t.Name == this.selectedName).Itid;
     await this.bookinService.GetGNCBookingDetails('0').subscribe((data) => {
-      console.info(data);
       this.bookingDetails = data;
       if (this.bookingDetails.length > 0) {
         this.bookingDetails.forEach((element) => {
@@ -153,7 +151,6 @@ export class GncBookingComponent implements OnInit, OnDestroy {
   }
 
   dayClicked({ date }: { date: Date }): void {
-    console.log(date);
     this.viewDate = date;
     this.view = CalendarView.Day;
   }
@@ -211,7 +208,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         this.eventsByItemId = this.eventsByItemId.filter((e) => e !== event);
         this.events = this.events.filter((e) => e !== event);
         if(event.id){
-          let eventData = new EventData(result);
+          let eventData = new EventData(event);
           this.bookinService.DeleteGNCBookingDetails(eventData)
             .subscribe((data) => {
             });
@@ -220,7 +217,9 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       }
       else if(result == 'duplicate'){
         let duplicateEvent = Cloneable.deepCopy(event);
-        duplicateEvent.id = undefined;
+        duplicateEvent.id = null;
+        duplicateEvent.start.setDate(new Date().getDate() + 1);
+        duplicateEvent.end.setDate(new Date().getDate() + 1);
         this.openEventModal(duplicateEvent, 'add');
       }
       else if (result && action == 'add') {
@@ -252,6 +251,10 @@ export class GncBookingComponent implements OnInit, OnDestroy {
           .subscribe((data) => {
           });
         this.refresh.next();
+      }
+
+      if(this.view == this.viewList){
+        this.cd.detectChanges();
       }
     },
       (reason) => {
@@ -300,5 +303,14 @@ export class GncBookingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.destroy$.next();
+  }
+
+  sort(property: string) {
+    this.events.sort((a, b) => {
+      const direction = a[property] > b[property] ? 1 : -1;
+      return this.sortDirection === 'asc' ? direction : -direction;
+    });
+  
+    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
   }
 }

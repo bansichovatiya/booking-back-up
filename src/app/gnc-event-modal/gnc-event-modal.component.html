@@ -10,7 +10,7 @@
             <button (click)="clearErrors()" class="btn-close close" data-dismiss="alert" aria-label="Close"></button>
         </div>
         <div class="input-group input-group-sm btn-group btn-group-sm mb-3" role="group">
-            <label for="exampleFormControlInput1" class="input-group-text">Booking Type*</label>
+            <label for="exampleFormControlInput1" class="input-group-text btype">Booking Type*: </label>
             <ng-container *ngFor="let type of bookingTypeList;">
                 <input type="radio" class="btn-check" name="btnradio" [id]="type" [value]="type" [(ngModel)]="event.meta.bookingType" autocomplete="off"  (change)="onBookingTypeChanged()" [disabled]="action == 'view' || action == 'edit'">
                 <label class="btn btn-outline-secondary" [for]="type">{{type}}</label>
@@ -34,9 +34,10 @@
                 <input type="date" class="form-control" [value]="event.end | date:'yyyy-MM-dd'" (input)="event.end=parseDate($any($event.target).value)" onkeydown="return false" (change)="filterPlaceAndEquimpents()" [disabled]="action == 'view'"/>
             </div>
             <div class="input-group input-group-sm mb-3">
-                <label class="input-group-text text-wrap" aria-required="true">Return time* (During office hours 11 AM to 7 PM)</label>
+                <label class="input-group-text text-wrap" aria-required="true">Return time*</label>
                 <input type='time' required class="form-control" [(ngModel)]="endTime" (change)="filterPlaceAndEquimpents()" onkeydown="return false" [disabled]="action == 'view'" />
             </div>
+            <div class="gnote">Note: During office hours 11 AM to 7 PM</div>
             <ng-container *ngIf="event.meta.bookingType == bookingTypeList[2]">
                 <div class="input-group input-group-sm mb-3" aria-required="true">
                     <label class="input-group-text">Set Up Required*</label>
@@ -68,9 +69,9 @@
                     <label for="otherRequirements" class="input-group-text">Any Other Requirements</label>
                     <input type="text" required class="form-control" id="otherRequirements" [(ngModel)]="event.meta.otherRequirements" [disabled]="action == 'view'">
                 </div>
-                <div class="input-group-sm mb-3" aria-required="true" *ngIf="event.meta.setUp == gncSetUpList[1]">
-                    <label class="input-group-text">Requirement of Equipment*</label>
-                    <ng-multiselect-dropdown
+                <div class="input-group input-group-sm mb-3" aria-required="true" *ngIf="event.meta.setUp == gncSetUpList[1]">
+                    <label class="input-group-text">Equipment*</label>
+                    <ng-multiselect-dropdown class="fmultiselect" 
                         [placeholder]="'Select Equipments'"
                         [data]="equipments"
                         [(ngModel)]="event.meta.equipments"
@@ -96,9 +97,9 @@
                 </div>
             </ng-container>
             <ng-container *ngIf="event.meta.bookingType == bookingTypeList[0]">
-                <div class="input-group-sm mb-3" aria-required="true">
-                    <label class="input-group-text">Requirement of Equipment*</label>
-                    <ng-multiselect-dropdown
+                <div class="input-group input-group-sm mb-3" aria-required="true">
+                    <label class="input-group-text">Equipment*</label>
+                    <ng-multiselect-dropdown class="fmultiselect" 
                         [placeholder]="'Select Equipments'"
                         [data]="equipments"
                         [(ngModel)]="event.meta.equipments"
