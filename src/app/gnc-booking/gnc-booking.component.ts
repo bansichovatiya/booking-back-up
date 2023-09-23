@@ -149,8 +149,20 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       }
       this.cd.detectChanges();
       this.refresh.next();
-    });
-
+      const component = this;
+        setTimeout(function () {
+          debugger
+          const zgRef = document.querySelector('zing-grid');
+          zgRef.addEventListener('record:click', (event: any) => {
+            debugger
+            console.log(component.events); 
+            const { ZGData, ZGEvent, ZGTarget } = event.detail;
+            let currentevent = ZGData.data.id;
+            let editEvent = component.events.find(e => e.id == currentevent);
+            component.eventClicked({event: editEvent});
+          });
+        }, 2000);
+      });
   }
 
   flattenMeta(meta: any): any {
@@ -245,6 +257,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
           let eventData = new EventData(event);
           this.bookinService.DeleteGNCBookingDetails(eventData)
             .subscribe((data) => {
+              this.getBookingDetails();
             });
         }
       }
@@ -261,6 +274,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
           .subscribe((data: EventData[]) => {
             if (data && data.length > 0) {
               result.id = data[0].bdid;
+              this.getBookingDetails();
             }
           });
         this.eventsByItemId = [
@@ -281,6 +295,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         let eventData = new EventData(result);
         this.bookinService.UpdateGNCBookingDetails(eventData)
           .subscribe((data) => {
+            this.getBookingDetails();
           });
       }
 

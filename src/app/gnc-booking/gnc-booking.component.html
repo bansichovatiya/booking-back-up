@@ -77,6 +77,9 @@
       <zing-grid caption="Booking Details" sort pager page-size="10" page-size-options="5,10,20" search filter column-resizable gridlines="both" layout="row" row-layout="2" 
         [data]="listDetials">
         <zg-colgroup>
+          <zg-column index="edit" label="Edit">
+            <zg-button><span slot="icon">&#9998; </span></zg-button>
+          </zg-column>
           <zg-column index="bookingType" header="Type" width="200px"></zg-column>
           <zg-column index="itemId" header="Department"></zg-column>
           <zg-column index="title" header="Name" width="200px"></zg-column>
