@@ -1,138 +1,142 @@
 <div class="container-fluid">
-    <div class="row align-items-center text-center mt-3 mb-2 booking">
-  
-      <div class="col-md-4 col-lg-3">
-        <h4 *ngIf="view != viewList">{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h4>
-      </div>
-  
-      <div class="col-md-2 col-lg-1 justify-content-md-end">
-        <div class="btn-group" *ngIf="view != viewList">
-          <div class="btn btn-sm btn-outline-secondary" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate">
-            ❮
-          </div>
-          <div class="btn btn-sm btn-outline-secondary" mwlCalendarToday [(viewDate)]="viewDate">
-            Today
-          </div>
-          <div class="btn btn-sm btn-outline-secondary" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate">
-            ❯
-          </div>
+  <div class="row align-items-center text-center mt-3 mb-2 booking">
+
+    <div class="col-md-4 col-lg-3">
+      <h4 *ngIf="view != viewList">{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h4>
+    </div>
+
+    <div class="col-md-2 col-lg-1 justify-content-md-end">
+      <div class="btn-group" *ngIf="view != viewList">
+        <div class="btn btn-sm btn-outline-secondary" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate">
+          ❮
         </div>
-      </div>
-      <div class="col-md-4 col-lg-3 offset-lg-2">
-        <div class="btn-group" role="group">
-          <div class="btn btn-sm btn-outline-secondary" (click)="setView(CalendarView.Month)"
-            [class.active]="view === CalendarView.Month">
-            Month
-          </div>
-          <div class="btn btn-sm btn-outline-secondary" (click)="setView(CalendarView.Week)"
-            [class.active]="view === CalendarView.Week">
-            Week
-          </div>
-          <div class="btn btn-sm btn-outline-secondary" (click)="setView(CalendarView.Day)"
-            [class.active]="view === CalendarView.Day">
-            Day
-          </div>
-          <div class="btn btn-sm btn-outline-secondary" (click)="setView(viewList)"
-            [class.active]="view === viewList">
-            List
-          </div>
-          <div style="cursor: pointer;" (click)="exportData()">
-            <img src="assets/image/export.png" />
-          </div>
+        <div class="btn btn-sm btn-outline-secondary" mwlCalendarToday [(viewDate)]="viewDate">
+          Today
         </div>
-      </div>
-  
-      <div class="col-md-3 col-lg-3">
-        <div class="input-group input-group-sm" aria-required="true">
-          <select class="form-select typedd" [(ngModel)]="selectedType" (change)="OnTypeChange($event.target.value)"
-            required required>
-            <option *ngFor="let item of types" [value]="item.Type">{{item.Type}}</option>
-          </select>
-          <select class="form-select" *ngIf="view != viewList" [(ngModel)]="selectedName" (change)="onChange($event.target.value)" required
-            required>
-            <option *ngFor="let item of eventTypes" [value]="item.Name">{{item.Name}}</option>
-          </select>
+        <div class="btn btn-sm btn-outline-secondary" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate">
+          ❯
         </div>
       </div>
     </div>
-  
-    <div [ngSwitch]="view">
-      <div class="week-view-container" style="overflow-x: auto;">
-        <mwl-calendar-month-view #monthView *ngSwitchCase="CalendarView.Month"
-          (dayClicked)="dayClicked($event.day)" 
-          [viewDate]="viewDate"
-          [events]="eventsByItemId"
-          [refresh]="refresh"
-          (eventClicked)="eventClicked($event)">
-        </mwl-calendar-month-view>
-  
-        <mwl-calendar-week-view #weekView *ngSwitchCase="CalendarView.Week"
-          [viewDate]="viewDate"
-          [events]="eventsByItemId"
-          [refresh]="refresh"
-          (eventClicked)="eventClicked($event)"
-          (dayHeaderClicked)="dayClicked($event.day)"
-          (hourSegmentClicked)="hourSegmentClicked($event.date)"
-          [dayStartHour]="starthour"
-          [dayEndHour]="24">
-        </mwl-calendar-week-view>
+    <div class="col-md-4 col-lg-3 offset-lg-2">
+      <div class="btn-group" role="group">
+        <div class="btn btn-sm btn-outline-secondary" (click)="setView(CalendarView.Month)"
+          [class.active]="view === CalendarView.Month">
+          Month
+        </div>
+        <div class="btn btn-sm btn-outline-secondary" (click)="setView(CalendarView.Week)"
+          [class.active]="view === CalendarView.Week">
+          Week
+        </div>
+        <div class="btn btn-sm btn-outline-secondary" (click)="setView(CalendarView.Day)"
+          [class.active]="view === CalendarView.Day">
+          Day
+        </div>
+        <div class="btn btn-sm btn-outline-secondary" (click)="setView(viewList)" [class.active]="view === viewList">
+          List
+        </div>
+        <div style="cursor: pointer;" (click)="exportData()">
+          <img src="assets/image/export.png" />
+        </div>
       </div>
-  
-      <mwl-calendar-day-view *ngSwitchCase="CalendarView.Day"
-        [viewDate]="viewDate"
-        [events]="eventsByItemId"
-        [refresh]="refresh"
-        (eventClicked)="eventClicked($event)"
-        [hourSegments]="2"
-        (hourSegmentClicked)="hourSegmentClicked($event.date)"
-        [dayStartHour]="starthour"
-        [dayEndHour]="24">
-      </mwl-calendar-day-view>
-      
-      <div *ngSwitchCase="viewList">
-        <table id="listview" class="table table-striped table-hover">
-          <thead>
-            <tr>
-              <th scope="col">Action</th>
-              <th scope="col">#</th>
-              <th scope="col">Type</th>
-              <th scope="col">Department</th>
-              <th scope="col">Name</th>
-              <th scope="col" (click)="sort('start')">Pick up Date <span class="sortarr">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
-              <th scope="col" (click)="sort('end')">Return Date <span class="sortarr">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span></th>
-              <th scope="col">Set up</th>
-              <th scope="col">Event Place</th>
-              <th scope="col">Laptop</th>
-              <th scope="col">Equipments</th>
-              <th scope="col">Other Requirements</th>
-              <th scope="col">Remarks</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let event of events; index as i">
-              <th scope="row"><button type="button" class="btn btn-secondary"
-                  (click)="eventClicked({event:event})">Edit</button></th>
-              <th scope="row">{{ i + 1 }}</th>
-              <td>{{ event.meta.bookingType }}</td>
-              <td>{{ getDepartmentbyItemID(event.meta.itemId) }}</td>
-              <td>{{ event.title }}</td>
-              <td>{{ getFormatDateString(event.start) }}</td>
-              <td>{{ getFormatDateString(event.end) }}</td>
-              <td>{{ event.meta.setUp }}</td>
-              <td *ngIf="event.meta.eventPlace != 'Other'">{{ event.meta.eventPlace }}</td>
-              <td *ngIf="event.meta.eventPlace == 'Other'">Other - {{ event.meta.otherPlace }}</td>
-              <td>{{ event.meta.laptop }}</td>
-              <td>
-                <ng-container *ngFor="let item of event.meta.equipments">
-                  {{ item }}<br>
-                </ng-container>
-              </td>
-              <td>{{ event.meta.otherRequirements }}</td>
-              <td>{{ event.meta.remarks }}</td>
-            </tr>
-          </tbody>
-        </table>
+    </div>
+
+    <div class="col-md-3 col-lg-3">
+      <div class="input-group input-group-sm" aria-required="true">
+        <select class="form-select typedd" [(ngModel)]="selectedType" (change)="OnTypeChange($event.target.value)"
+          required required>
+          <option *ngFor="let item of types" [value]="item.Type">{{item.Type}}</option>
+        </select>
+        <select class="form-select" *ngIf="view != viewList" [(ngModel)]="selectedName"
+          (change)="onChange($event.target.value)" required required>
+          <option *ngFor="let item of eventTypes" [value]="item.Name">{{item.Name}}</option>
+        </select>
       </div>
     </div>
   </div>
-  <div class="mb-5"></div>
+
+  <div [ngSwitch]="view">
+    <div class="week-view-container" style="overflow-x: auto;">
+      <mwl-calendar-month-view #monthView *ngSwitchCase="CalendarView.Month" (dayClicked)="dayClicked($event.day)"
+        [viewDate]="viewDate" [events]="eventsByItemId" [refresh]="refresh" (eventClicked)="eventClicked($event)">
+      </mwl-calendar-month-view>
+
+      <mwl-calendar-week-view #weekView *ngSwitchCase="CalendarView.Week" [viewDate]="viewDate"
+        [events]="eventsByItemId" [refresh]="refresh" (eventClicked)="eventClicked($event)"
+        (dayHeaderClicked)="dayClicked($event.day)" (hourSegmentClicked)="hourSegmentClicked($event.date)"
+        [dayStartHour]="starthour" [dayEndHour]="24">
+      </mwl-calendar-week-view>
+    </div>
+
+    <mwl-calendar-day-view *ngSwitchCase="CalendarView.Day" [viewDate]="viewDate" [events]="eventsByItemId"
+      [refresh]="refresh" (eventClicked)="eventClicked($event)" [hourSegments]="2"
+      (hourSegmentClicked)="hourSegmentClicked($event.date)" [dayStartHour]="starthour" [dayEndHour]="24">
+    </mwl-calendar-day-view>
+
+    <div *ngSwitchCase="viewList">
+      <zing-grid caption="Booking Details" sort pager page-size="10" page-size-options="5,10,20" search filter column-resizable gridlines="both" layout="row" row-layout="2" 
+        [data]="listDetials">
+        <zg-colgroup>
+          <zg-column index="bookingType" header="Type" width="200px"></zg-column>
+          <zg-column index="itemId" header="Department"></zg-column>
+          <zg-column index="title" header="Name" width="200px"></zg-column>
+          <zg-column index="start" header="Pick up DateTime" width="200px"></zg-column>
+          <zg-column index="end" header="Return DateTime" width="200px"></zg-column>
+          <zg-column index="setUp" header="Set Up" width="200px"></zg-column>
+          <zg-column index="eventPlace" header="Event Place" width="200px"></zg-column>
+          <zg-column index="laptop" header="Laptop" width="100px"></zg-column>
+          <zg-column index="equipments" header="Equipments" width="400px"></zg-column>
+          <zg-column index="otherRequirements" header="Other Requirements" width="200px"></zg-column>
+          <zg-column index="remarks" header="Remarks" width="200px"></zg-column>
+        </zg-colgroup>
+    </zing-grid>
+
+
+      <!-- <table id="listview" class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Action</th>
+            <th scope="col">#</th>
+            <th scope="col">Type</th>
+            <th scope="col">Department</th>
+            <th scope="col">Name</th>
+            <th scope="col" (click)="sort('start')">Pick up Date <span class="sortarr">{{ sortDirection === 'asc' ? '▲'
+                : '▼' }}</span></th>
+            <th scope="col" (click)="sort('end')">Return Date <span class="sortarr">{{ sortDirection === 'asc' ? '▲' :
+                '▼' }}</span></th>
+            <th scope="col">Set up</th>
+            <th scope="col">Event Place</th>
+            <th scope="col">Laptop</th>
+            <th scope="col">Equipments</th>
+            <th scope="col">Other Requirements</th>
+            <th scope="col">Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let event of events; index as i">
+            <th scope="row"><button type="button" class="btn btn-secondary"
+                (click)="eventClicked({event:event})">{{event.meta.ispast ? 'View' : 'Edit'}}</button></th>
+            <th scope="row">{{ i + 1 }}</th>
+            <td>{{ event.meta.bookingType }}</td>
+            <td>{{ getDepartmentbyItemID(event.meta.itemId) }}</td>
+            <td>{{ event.title }}</td>
+            <td>{{ getFormatDateString(event.start) }}</td>
+            <td>{{ getFormatDateString(event.end) }}</td>
+            <td>{{ event.meta.setUp }}</td>
+            <td *ngIf="event.meta.eventPlace != 'Other'">{{ event.meta.eventPlace }}</td>
+            <td *ngIf="event.meta.eventPlace == 'Other'">Other - {{ event.meta.otherPlace }}</td>
+            <td>{{ event.meta.laptop }}</td>
+            <td>
+              <ol>
+                <li *ngFor="let item of event.meta.equipments">{{ item }}</li>
+              </ol>
+            </td>
+            <td>{{ event.meta.otherRequirements }}</td>
+            <td>{{ event.meta.remarks }}</td>
+          </tr>
+        </tbody>
+      </table> -->
+    </div>
+  </div>
+</div>
+<div class="mb-5"></div>

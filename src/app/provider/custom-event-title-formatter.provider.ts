@@ -14,8 +14,7 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
     let startDate = "Start - " + formatDate(event.start, 'dd-MM-yyyy hh:mm a', this.locale);
     let endDate = event.end != null ? "End - " + formatDate(event.end, 'dd-MM-yyyy hh:mm a', this.locale) : '';
     let data  = event.meta.bookingType == 'Mht Booking'? `${event.meta.setUp}<br>${event.meta.eventPlace}` : '';
-    return `<b>${event.title}</b><br>
-            Type - ${event.meta.bookingType}<br>
+    return `<b>${event.title}</b> (${event.meta.bookingType})<br>
             ${startDate}<br>
             ${endDate}<br>
             ${data}`;
@@ -26,8 +25,7 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
     let endDate = event.end != null ? "End - " + formatDate(event.end, 'dd-MM-yyyy hh:mm a', this.locale) : '';
     let data  = event.meta.bookingType == 'Mht Booking'? `${event.meta.setUp}<br>${event.meta.eventPlace}` : 
                 event.meta.bookingType == 'Only Hall'? `${event.meta.eventPlace}`: '';
-    return `<b>${event.title}</b><br>
-            Type - ${event.meta.bookingType}<br>
+    return `<b>${event.title}</b> (${event.meta.bookingType})<br>
             ${startDate}<br>
             ${endDate}<br>
             ${data}`;

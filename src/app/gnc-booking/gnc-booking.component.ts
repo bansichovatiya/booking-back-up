@@ -14,6 +14,7 @@ import { formatDate } from '@angular/common';
 import { IgxExcelExporterOptions, IgxExcelExporterService } from 'igniteui-angular';
 import { GncEventModalComponent } from '../gnc-event-modal/gnc-event-modal.component';
 import { EventData } from '../models/EventData';
+import 'zinggrid';
 
 @Component({
   selector: 'app-gnc-booking',
@@ -58,6 +59,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
   weekView!: CalendarWeekViewComponent;
   @ViewChild('monthView')
   monthView!: CalendarMonthViewComponent;
+  listDetials: any;
   calendarConfig = {
     weekStartsOn: 1 // Monday is the first day of the week
   };
@@ -107,13 +109,15 @@ export class GncBookingComponent implements OnInit, OnDestroy {
 
   async getBookingDetails() {
     // Required all events for filter event place and equipments in modal and to show by selected type from dropdown.
-    
+
     let ItemId = this.eventTypes.find((t: { Name: any; }) => t.Name == this.selectedName).Itid;
     await this.bookinService.GetGNCBookingDetails('0').subscribe((data) => {
       this.bookingDetails = data;
+      this.listDetials = [];
       if (this.bookingDetails.length > 0) {
         this.bookingDetails.forEach((element) => {
           let equpiments: string[] = element.Equipments ? element.Equipments.split(',') : [];
+          let currentDate = new Date();
           let event: CalendarEvent<any> = {
             id: element.bdid,
             title: element.Person_Name,
@@ -130,9 +134,12 @@ export class GncBookingComponent implements OnInit, OnDestroy {
               laptop: element.Laptop,
               otherRequirements: element.OtherRequirments,
               remarks: element.Remarks,
+              ispast: (new Date(element.Etime) > currentDate ? false : true)
             },
           }
           this.events.push(event);
+          const flattenedElement = this.flattenMeta(event);
+          this.listDetials.push(flattenedElement);
         });
         this.eventsByItemId = this.events.filter(e => e.meta.itemId == ItemId);
       }
@@ -143,7 +150,34 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       this.cd.detectChanges();
       this.refresh.next();
     });
-   
+
+  }
+
+  flattenMeta(meta: any): any {
+    const flattenedMeta: any = {};
+    flattenedMeta['start'] = this.getFormatDateString(meta.start);
+    flattenedMeta['end'] = this.getFormatDateString(meta.end);
+    for (const key in meta) {
+      if (meta.hasOwnProperty(key)) {
+        if (typeof meta[key] === 'object' && meta[key] !== null) {
+          const nestedKeys = Object.keys(meta[key]);
+          for (const nestedKey of nestedKeys) {
+            if (nestedKey == 'itemId') {
+              flattenedMeta[`${nestedKey}`] = this.getDepartmentbyItemID(meta[key][nestedKey]);
+            }
+            else if (nestedKey == 'equipments') {
+              flattenedMeta[`${nestedKey}`] = meta[key][nestedKey].join(', ');
+            }
+            else {
+              flattenedMeta[`${nestedKey}`] = meta[key][nestedKey];
+            }
+          }
+        } else {
+          flattenedMeta[key] = meta[key];
+        }
+      }
+    }
+    return flattenedMeta;
   }
 
   setView(view: any) {
@@ -169,7 +203,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       id: null,
       title: '',
       start: startOfMinute(date),
-      end: addMinutes(startOfMinute(date), 30),
+      end: null,
       color: Constants.getColorbyName(this.selectedColor),
       meta: {
         itemId: this.selectedItemId,
@@ -186,7 +220,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
 
     const getdate = moment(newEvent.start, 'YYYY-MM-DDTHH:mm:ssZ').toDate();
     const curdate = moment().toDate();
-    
+
     if (getdate >= curdate)
       this.openEventModal(newEvent, 'add');
     else
@@ -195,7 +229,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
 
   openEventModal(event: CalendarEvent<any>, action: string) {
     let deepCopyEvent = Cloneable.deepCopy(event);
-    const modalRef = this.modalService.open(GncEventModalComponent,  { backdrop: 'static', keyboard: false });
+    const modalRef = this.modalService.open(GncEventModalComponent, { backdrop: 'static', keyboard: false });
     modalRef.componentInstance.event = deepCopyEvent;
     modalRef.componentInstance.selectedType = this.selectedType;
     modalRef.componentInstance.selectedName = this.selectedName;
@@ -207,15 +241,14 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       if (result == 'delete') {
         this.eventsByItemId = this.eventsByItemId.filter((e) => e !== event);
         this.events = this.events.filter((e) => e !== event);
-        if(event.id){
+        if (event.id) {
           let eventData = new EventData(event);
           this.bookinService.DeleteGNCBookingDetails(eventData)
             .subscribe((data) => {
             });
         }
-        this.refresh.next();
       }
-      else if(result == 'duplicate'){
+      else if (result == 'duplicate') {
         let duplicateEvent = Cloneable.deepCopy(event);
         duplicateEvent.id = null;
         duplicateEvent.start.setDate(new Date().getDate() + 1);
@@ -225,9 +258,9 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       else if (result && action == 'add') {
         let eventData = new EventData(result);
         this.bookinService.InsertGNCBookingDetails(eventData)
-          .subscribe((data : EventData[]) => {
-            if(data && data.length > 0){
-              result.bdid = data[0].bdid;
+          .subscribe((data: EventData[]) => {
+            if (data && data.length > 0) {
+              result.id = data[0].bdid;
             }
           });
         this.eventsByItemId = [
@@ -238,7 +271,6 @@ export class GncBookingComponent implements OnInit, OnDestroy {
           ...this.events,
           result,
         ];
-        this.refresh.next();
       }
       else if (result && action == 'edit') {
         event.title = result.title;
@@ -250,10 +282,11 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         this.bookinService.UpdateGNCBookingDetails(eventData)
           .subscribe((data) => {
           });
-        this.refresh.next();
       }
 
-      if(this.view == this.viewList){
+      this.refresh.next();
+      this.cd.detectChanges();
+      if (this.view == this.viewList) {
         this.cd.detectChanges();
       }
     },
@@ -278,12 +311,12 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         'Person Name': element.title,
         'Pick up Date': moment(element.start).format('DD-MM-YYYY hh:mm A'),
         'Return Date': moment(element.end).format('DD-MM-YYYY hh:mm A'),
-        'Set up' : element.meta.setUp,
-        'Event Place' : element.meta.eventPlace,
-        'Laptop' : element.meta.laptop,
-        'Equipments' : data,
-        'Other Requirements' : element.meta.otherRequirements,
-        'Remarks' : element.meta.remarks,
+        'Set up': element.meta.setUp,
+        'Event Place': element.meta.eventPlace,
+        'Laptop': element.meta.laptop,
+        'Equipments': data,
+        'Other Requirements': element.meta.otherRequirements,
+        'Remarks': element.meta.remarks,
       }
       exportDataList.push(event);
       i++;
@@ -291,13 +324,13 @@ export class GncBookingComponent implements OnInit, OnDestroy {
     this.excelExportService.exportData(exportDataList, new IgxExcelExporterOptions(fileName));
   }
 
-  getFormatDateString(date: Date | undefined){
-    if(date)
+  getFormatDateString(date: Date | undefined) {
+    if (date)
       return formatDate(date, 'dd-MM-yyyy hh:mm a', this.locale);
     return '';
   }
 
-  getDepartmentbyItemID(itemId: number){
+  getDepartmentbyItemID(itemId: number) {
     return this.eventTypes.find((t: { Itid: number; }) => t.Itid == itemId).Name;
   }
 
@@ -310,7 +343,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       const direction = a[property] > b[property] ? 1 : -1;
       return this.sortDirection === 'asc' ? direction : -direction;
     });
-  
+
     this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
   }
 }

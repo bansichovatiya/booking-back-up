@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-dialog-scrollable" style="margin: 0;">
+<div class="modal-dialog modal-dialog-scrollable modal-with-blur" style="margin: 0;">
     <div class="modal-content">
     <div class="modal-header" >
         <h4 class="modal-title" id="modal-basic-title">{{action}}</h4>
@@ -10,10 +10,10 @@
             <button (click)="clearErrors()" class="btn-close close" data-dismiss="alert" aria-label="Close"></button>
         </div>
         <div class="input-group input-group-sm btn-group btn-group-sm mb-3" role="group">
-            <label for="exampleFormControlInput1" class="input-group-text btype">Booking Type*: </label>
+            <label for="exampleFormControlInput1" class="input-group-text btype">Type*: </label>
             <ng-container *ngFor="let type of bookingTypeList;">
                 <input type="radio" class="btn-check" name="btnradio" [id]="type" [value]="type" [(ngModel)]="event.meta.bookingType" autocomplete="off"  (change)="onBookingTypeChanged()" [disabled]="action == 'view' || action == 'edit'">
-                <label class="btn btn-outline-secondary" [for]="type">{{type}}</label>
+                <label class="btn btn-outline-secondary p-5" [for]="type">{{type}}</label>
             </ng-container>
         </div>
         <ng-container *ngIf="event.meta.bookingType != null">
@@ -22,11 +22,11 @@
                 <input type="text" required class="form-control" id="eventTitle" [(ngModel)]="event.title" [disabled]="action == 'view'">
             </div>
             <div class="input-group input-group-sm mb-3">
-                <label class="input-group-text" aria-required="true">Pick up date*</label>
+                <label class="input-group-text" aria-required="true">Pick up Date*</label>
                 <input type="date" class="form-control" [value]="event.start | date:'yyyy-MM-dd'" (input)="event.start=parseDate($any($event.target).value)"  onkeydown="return false" (change)="filterPlaceAndEquimpents()" [disabled]="action == 'view'"/>
             </div>
             <div class="input-group input-group-sm mb-3">
-                <label class="input-group-text">Pick up time*</label>
+                <label class="input-group-text">Pick up Time*</label>
                 <input type='time' required class="form-control" [(ngModel)]="startTime" (change)="filterPlaceAndEquimpents()" onkeydown="return false" [disabled]="action == 'view'"/>
             </div>
             <div class="input-group input-group-sm mb-3">
@@ -34,7 +34,7 @@
                 <input type="date" class="form-control" [value]="event.end | date:'yyyy-MM-dd'" (input)="event.end=parseDate($any($event.target).value)" onkeydown="return false" (change)="filterPlaceAndEquimpents()" [disabled]="action == 'view'"/>
             </div>
             <div class="input-group input-group-sm mb-3">
-                <label class="input-group-text text-wrap" aria-required="true">Return time*</label>
+                <label class="input-group-text text-wrap" aria-required="true">Return Time*</label>
                 <input type='time' required class="form-control" [(ngModel)]="endTime" (change)="filterPlaceAndEquimpents()" onkeydown="return false" [disabled]="action == 'view'" />
             </div>
             <div class="gnote">Note: During office hours 11 AM to 7 PM</div>
@@ -109,7 +109,7 @@
             </ng-container>
         </ng-container>
     </div>
-    <div class="modal-footer">
+    <div class="modal-footer" *ngIf="event.meta.bookingType != null">
         <button type="submit" class="btn btn-primary" *ngIf ="action == 'view' || action == 'edit'"(click)="passBack('duplicate')"
         data-toggle="tooltip" data-placement="top" title="Change the date first after duplicating the event.">Duplicate</button>
         <button type="submit" class="btn btn-danger" *ngIf="action == 'edit'" (click)="openModel(deleteConfirmModel)">Delete</button>

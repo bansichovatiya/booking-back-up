@@ -92,3 +92,10 @@ table {
         display: inline-block;
     } */
 }
+
+zing-grid {
+    --zg-caption-background: #6c757d;
+    --zg-control-bar-background: #fff;
+    --zg-cell-padding: 5px;
+    --zg-watermark-color: #fff;
+}

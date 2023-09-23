@@ -13,6 +13,7 @@ import { IgxExcelExporterService, IgxGridModule, IgxIconModule } from 'igniteui-
 import { GncBookingComponent } from './gnc-booking/gnc-booking.component';
 import { GncEventModalComponent } from './gnc-event-modal/gnc-event-modal.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import 'zinggrid';
 
 @NgModule({
   declarations: [

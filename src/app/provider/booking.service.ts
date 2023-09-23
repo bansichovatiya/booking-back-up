@@ -27,7 +27,7 @@ export class BookingService {
   }
 
   GetBookingDetails(itemid: string) {
-    let myParams = new HttpParams().set('itemid', itemid).set('date', '2023-03-18');
+    let myParams = new HttpParams().set('itemid', itemid);
     return this.http.get((this.apiUrl + 'getbookingdetails'), { params: myParams }).pipe(map(data => {
       return data;
     })
