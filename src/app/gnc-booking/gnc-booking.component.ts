@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, Inject, LOCALE_ID } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, Inject, LOCALE_ID, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarDateFormatter, CalendarEvent, CalendarEventTitleFormatter, CalendarMonthViewComponent, CalendarView, CalendarWeekViewComponent } from 'angular-calendar';
-import { addMinutes, startOfMinute } from 'date-fns';
+import { addDays, addMinutes, differenceInBusinessDays, differenceInCalendarDays, isSameDay, isToday, startOfMinute } from 'date-fns';
 import { Subject } from 'rxjs'
 import { Cloneable } from '../helper/cloneable';
 import { BookingService } from '../provider/booking.service';
@@ -21,6 +21,7 @@ import 'zinggrid';
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './gnc-booking.component.html',
   styleUrls: ['./gnc-booking.component.css'],
+  encapsulation: ViewEncapsulation.None,
   providers: [
     {
       provide: CalendarDateFormatter,
@@ -109,7 +110,6 @@ export class GncBookingComponent implements OnInit, OnDestroy {
 
   async getBookingDetails() {
     // Required all events for filter event place and equipments in modal and to show by selected type from dropdown.
-
     let ItemId = this.eventTypes.find((t: { Name: any; }) => t.Name == this.selectedName).Itid;
     await this.bookinService.GetGNCBookingDetails('0').subscribe((data) => {
       this.bookingDetails = data;
@@ -149,20 +149,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       }
       this.cd.detectChanges();
       this.refresh.next();
-      const component = this;
-        setTimeout(function () {
-          debugger
-          const zgRef = document.querySelector('zing-grid');
-          zgRef.addEventListener('record:click', (event: any) => {
-            debugger
-            console.log(component.events); 
-            const { ZGData, ZGEvent, ZGTarget } = event.detail;
-            let currentevent = ZGData.data.id;
-            let editEvent = component.events.find(e => e.id == currentevent);
-            component.eventClicked({event: editEvent});
-          });
-        }, 2000);
-      });
+    });
   }
 
   flattenMeta(meta: any): any {
@@ -180,6 +167,15 @@ export class GncBookingComponent implements OnInit, OnDestroy {
             else if (nestedKey == 'equipments') {
               flattenedMeta[`${nestedKey}`] = meta[key][nestedKey].join(', ');
             }
+            else if (nestedKey == 'laptop') {
+              if (meta.meta.bookingType == 'Activity Booking' && meta.meta.setUp == 'Fixed Setup')
+                flattenedMeta[`${nestedKey}`] = meta[key][nestedKey] == true ? 'Yes' : 'No';
+              else
+                flattenedMeta[`${nestedKey}`] = '';
+            }
+            else if(nestedKey == 'eventPlace' && meta.meta.eventPlace == 'Other'){
+              flattenedMeta[`${nestedKey}`] = 'Other - '+ meta.meta.otherPlace;
+            }
             else {
               flattenedMeta[`${nestedKey}`] = meta[key][nestedKey];
             }
@@ -194,6 +190,18 @@ export class GncBookingComponent implements OnInit, OnDestroy {
 
   setView(view: any) {
     this.view = view;
+    if (this.view == 'List') {
+      const component = this;
+      setTimeout(function () {
+        const zgRef = document.querySelector('zing-grid');
+        zgRef.addEventListener('record:click', (event: any) => {
+          const { ZGData, ZGEvent, ZGTarget } = event.detail;
+          let currentevent = ZGData.data.id;
+          let editEvent = component.events.find(e => e.id == currentevent);
+          component.eventClicked({ event: editEvent });
+        });
+      }, 2000);
+    }
   }
 
   dayClicked({ date }: { date: Date }): void {
@@ -255,17 +263,22 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         this.events = this.events.filter((e) => e !== event);
         if (event.id) {
           let eventData = new EventData(event);
+          this.listDetials = this.listDetials.filter((e) => e.id !== event.id);
+          this.refreshZingGrid();
           this.bookinService.DeleteGNCBookingDetails(eventData)
             .subscribe((data) => {
-              this.getBookingDetails();
             });
         }
       }
       else if (result == 'duplicate') {
         let duplicateEvent = Cloneable.deepCopy(event);
         duplicateEvent.id = null;
-        duplicateEvent.start.setDate(new Date().getDate() + 1);
-        duplicateEvent.end.setDate(new Date().getDate() + 1);
+        if(duplicateEvent.start > new Date()){
+          duplicateEvent.start = addDays(duplicateEvent.start, differenceInCalendarDays(duplicateEvent.start, new Date()));
+        }else{
+          duplicateEvent.start = addDays(duplicateEvent.start, differenceInCalendarDays(new Date(), duplicateEvent.start));
+        }
+        duplicateEvent.end = null;
         this.openEventModal(duplicateEvent, 'add');
       }
       else if (result && action == 'add') {
@@ -274,7 +287,9 @@ export class GncBookingComponent implements OnInit, OnDestroy {
           .subscribe((data: EventData[]) => {
             if (data && data.length > 0) {
               result.id = data[0].bdid;
-              this.getBookingDetails();
+              let updatedval = this.flattenMeta(result);
+              this.listDetials.unshift(updatedval);
+              this.refreshZingGrid();
             }
           });
         this.eventsByItemId = [
@@ -291,11 +306,17 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         event.start = result.start;
         event.end = result.end;
         event.meta = result.meta;
-        this.refresh.next();
         let eventData = new EventData(result);
+        let updatedval = this.flattenMeta(event);
+        const indexToReplace = this.listDetials.findIndex(item => item.id === updatedval.id);
+        if (indexToReplace !== -1) {
+          this.listDetials[indexToReplace] = updatedval;
+        }
+        this.refresh.next();
+        this.refreshZingGrid();
         this.bookinService.UpdateGNCBookingDetails(eventData)
           .subscribe((data) => {
-            this.getBookingDetails();
+            this.cd.detectChanges();
           });
       }
 
@@ -309,6 +330,12 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       });
   }
 
+  refreshZingGrid() {
+    if (this.view == 'List') {
+      let refgrid = document.querySelector('zing-grid');
+      refgrid.refresh();
+    }
+  }
   public exportData() {
     let fileName = "BookingDetails_" + this.selectedType;
     let exportDataList: any[] = [];
@@ -319,19 +346,23 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       element.meta.equipments.forEach((e: string) => {
         data = `${data}\n${e}`;
       });
+      let laptoptxt = '';
+      if (element.meta.bookingType == 'Activity Booking' && element.meta.setUp == 'Fixed Setup') {
+        laptoptxt = element.meta.laptop == true ? 'Yes' : 'No';
+      }
       let event = {
         'Sr No': i,
         'Type': element.meta.bookingType,
         'Department': department,
         'Person Name': element.title,
-        'Pick up Date': moment(element.start).format('DD-MM-YYYY hh:mm A'),
-        'Return Date': moment(element.end).format('DD-MM-YYYY hh:mm A'),
+        'Pick up/Start DateTime': moment(element.start).format('DD-MM-YYYY hh:mm A'),
+        'Return/End DateTime': moment(element.end).format('DD-MM-YYYY hh:mm A'),
         'Set up': element.meta.setUp,
-        'Event Place': element.meta.eventPlace,
-        'Laptop': element.meta.laptop,
+        'Event Place': element.meta.eventPlace == 'Other' ? 'Other - '+ element.meta.otherPlace : element.meta.eventPlace,
+        'Laptop': laptoptxt,
         'Equipments': data,
         'Other Requirements': element.meta.otherRequirements,
-        'Remarks': element.meta.remarks,
+        'Remarks/Purpose': element.meta.remarks,
       }
       exportDataList.push(event);
       i++;

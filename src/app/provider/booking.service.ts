@@ -7,9 +7,7 @@ import { EventData } from '../models/EventData';
   providedIn: 'root'
 })
 export class BookingService {
-  // apiUrl: any = 'https://mhtapi.dadabhagwan.org/api/booking/';
   apiUrl: any = 'http://mhtapitest.dadabhagwan.org/api/booking/';
-  // apiUrl: any = 'http://localhost:50655/api/booking/';
   constructor(private http: HttpClient) { }
 
   GetPersonName(name: string) {

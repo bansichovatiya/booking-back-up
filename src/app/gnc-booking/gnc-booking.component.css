@@ -41,8 +41,9 @@ table {
     box-shadow: 20px 20px 20px 5px #a7bad3;
     background-color: white;
     text-align: left; */
-   
+
 }
+
 /* th {
     background-color: #d0def2;
     padding: 0.75rem 2rem;
@@ -82,6 +83,10 @@ table {
         margin-bottom: 0.5rem;
     }
 
+    .custom-header-padding .zpager {
+        display: inline-block;
+    }
+
     /* .week-view-container {
         width: 100%;
         overflow-x: auto;
@@ -96,6 +101,17 @@ table {
 zing-grid {
     --zg-caption-background: #6c757d;
     --zg-control-bar-background: #fff;
-    --zg-cell-padding: 5px;
     --zg-watermark-color: #fff;
+    --zg-cell-label-margin_layout_card: 0 0 2px;
+    --zg-cell-padding: 5px;
+    --zg-filter-input-margin: auto !important;
+}
+
+.custom-header-padding input{
+    margin: auto !important;
+}
+
+.custom-header-padding label{
+    padding-right: 10px;
+    font-size: 14px;
 }

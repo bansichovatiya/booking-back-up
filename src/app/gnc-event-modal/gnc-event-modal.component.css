@@ -2,6 +2,9 @@
     text-transform: capitalize;
 }
 
+.modal{
+    z-index: 1050;
+}
 /* .input-group-text {
     width: 150px !important;
 } */
@@ -12,6 +15,10 @@ ng-multiselect-dropdown {
     flex: 1 1 auto;
     width: 1%;
     min-width: 0;
+}
+
+ng-multiselect-dropdown .dropdown-list{
+    position: relative !important;
 }
 
 .btype {
@@ -52,4 +59,8 @@ ng-multiselect-dropdown {
 
 .blur-background {
     opacity: 0.5;
+}
+
+.modal-open mwl-calendar-tooltip-window {
+    display: none;
 }

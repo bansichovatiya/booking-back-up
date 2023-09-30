@@ -13,7 +13,8 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
   week(event: CalendarEvent): string {
     let startDate = "Start - " + formatDate(event.start, 'dd-MM-yyyy hh:mm a', this.locale);
     let endDate = event.end != null ? "End - " + formatDate(event.end, 'dd-MM-yyyy hh:mm a', this.locale) : '';
-    let data  = event.meta.bookingType == 'Mht Booking'? `${event.meta.setUp}<br>${event.meta.eventPlace}` : '';
+    let data  = event.meta.bookingType == 'Activity Booking'? `${event.meta.setUp}<br>
+                  ${event.meta.eventPlace == 'Other' ? 'Other - '+ event.meta.otherPlace : event.meta.eventPlace}` : '';
     return `<b>${event.title}</b> (${event.meta.bookingType})<br>
             ${startDate}<br>
             ${endDate}<br>
@@ -23,8 +24,8 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
   day(event: CalendarEvent): string {
     let startDate = "Start - " + formatDate(event.start, 'dd-MM-yyyy hh:mm a', this.locale);
     let endDate = event.end != null ? "End - " + formatDate(event.end, 'dd-MM-yyyy hh:mm a', this.locale) : '';
-    let data  = event.meta.bookingType == 'Mht Booking'? `${event.meta.setUp}<br>${event.meta.eventPlace}` : 
-                event.meta.bookingType == 'Only Hall'? `${event.meta.eventPlace}`: '';
+    let data  = event.meta.bookingType == 'Activity Booking'? `${event.meta.setUp}<br>
+                  ${event.meta.eventPlace == 'Other' ? 'Other - '+ event.meta.otherPlace : event.meta.eventPlace}` : '';
     return `<b>${event.title}</b> (${event.meta.bookingType})<br>
             ${startDate}<br>
             ${endDate}<br>

@@ -21,23 +21,29 @@
                 <label for="eventTitle" class="input-group-text">Name*</label>
                 <input type="text" required class="form-control" id="eventTitle" [(ngModel)]="event.title" [disabled]="action == 'view'">
             </div>
+            
             <div class="input-group input-group-sm mb-3">
-                <label class="input-group-text" aria-required="true">Pick up Date*</label>
+                <label *ngIf="event.meta.bookingType != bookingTypeList[1]" class="input-group-text" aria-required="true">Pick up Date*</label>
+                <label *ngIf="event.meta.bookingType == bookingTypeList[1]" class="input-group-text" aria-required="true">Booking Date*</label>
                 <input type="date" class="form-control" [value]="event.start | date:'yyyy-MM-dd'" (input)="event.start=parseDate($any($event.target).value)"  onkeydown="return false" (change)="filterPlaceAndEquimpents()" [disabled]="action == 'view'"/>
             </div>
             <div class="input-group input-group-sm mb-3">
-                <label class="input-group-text">Pick up Time*</label>
+                <label *ngIf="event.meta.bookingType != bookingTypeList[1]" class="input-group-text">Pick up Time*</label>
+                <label *ngIf="event.meta.bookingType == bookingTypeList[1]" class="input-group-text">Start Time*</label>
                 <input type='time' required class="form-control" [(ngModel)]="startTime" (change)="filterPlaceAndEquimpents()" onkeydown="return false" [disabled]="action == 'view'"/>
             </div>
-            <div class="input-group input-group-sm mb-3">
-                <label class="input-group-text"  aria-required="true">Return Date*</label>
+            <div class="input-group input-group-sm mb-3" *ngIf="event.meta.bookingType != bookingTypeList[1]">
+                <label *ngIf="event.meta.bookingType != bookingTypeList[1]" class="input-group-text"  aria-required="true">Return Date*</label>
                 <input type="date" class="form-control" [value]="event.end | date:'yyyy-MM-dd'" (input)="event.end=parseDate($any($event.target).value)" onkeydown="return false" (change)="filterPlaceAndEquimpents()" [disabled]="action == 'view'"/>
             </div>
             <div class="input-group input-group-sm mb-3">
-                <label class="input-group-text text-wrap" aria-required="true">Return Time*</label>
+                <label *ngIf="event.meta.bookingType != bookingTypeList[1]" class="input-group-text text-wrap" aria-required="true">Return Time*</label>
+                <label *ngIf="event.meta.bookingType == bookingTypeList[1]" class="input-group-text text-wrap" aria-required="true">End Time*</label>
                 <input type='time' required class="form-control" [(ngModel)]="endTime" (change)="filterPlaceAndEquimpents()" onkeydown="return false" [disabled]="action == 'view'" />
             </div>
-            <div class="gnote">Note: During office hours 11 AM to 7 PM</div>
+            <div class="gnote" *ngIf="event.meta.bookingType != bookingTypeList[1]">Note: During office hours 11 AM to 7 PM</div>
+
+            <!-- Activity Booking -->
             <ng-container *ngIf="event.meta.bookingType == bookingTypeList[2]">
                 <div class="input-group input-group-sm mb-3" aria-required="true">
                     <label class="input-group-text">Set Up Required*</label>
@@ -87,15 +93,16 @@
                     <input type="text" required class="form-control" id="remarks" [(ngModel)]="event.meta.remarks" [disabled]="action == 'view'">
                 </div>
             </ng-container>
+
+            <!-- GNC Basement Hall -->
             <ng-container *ngIf="event.meta.bookingType == bookingTypeList[1]">
-                <div class="input-group input-group-sm mb-3" aria-required="true">
-                    <label class="input-group-text">Event Place*</label>
-                    <select class="form-select" [(ngModel)]="event.meta.eventPlace" required [disabled]="action == 'view'">
-                        <option disabled selected value="">Select</option>
-                        <option *ngFor="let item of eventPlaces" [value]="item">{{item}}</option>
-                    </select>
+                <div class="input-group input-group-sm mb-3">
+                    <label for="purpose" class="input-group-text">Purpose*</label>
+                    <input type="text" required class="form-control" id="purpose" [(ngModel)]="event.meta.remarks" [disabled]="action == 'view'">
                 </div>
             </ng-container>
+
+            <!-- Only Laptop -->
             <ng-container *ngIf="event.meta.bookingType == bookingTypeList[0]">
                 <div class="input-group input-group-sm mb-3" aria-required="true">
                     <label class="input-group-text">Equipment*</label>
@@ -103,7 +110,7 @@
                         [placeholder]="'Select Equipments'"
                         [data]="equipments"
                         [(ngModel)]="event.meta.equipments"
-                        [settings]="equipmentsDropdownSettings"
+                        [settings]=" onlyLaptopEquipmentsDropdownSettings"
                         [disabled]="action == 'view'"></ng-multiselect-dropdown>
                 </div>
             </ng-container>
