@@ -124,14 +124,13 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       if (this.bookingDetails.length > 0) {
         this.bookingDetails.forEach((element) => {
           let equpiments: string[] = element.Equipments ? element.Equipments.split(',') : [];
-          let color = this.eventTypes.find((t: { Itid: number; }) => t.Itid == element.Itid).Color;
           let currentDate = new Date();
           let event: CalendarEvent<any> = {
             id: element.bdid,
             title: element.Person_Name,
             start: moment(element.Stime, 'YYYY-MM-DDTHH:mm:ssZ').toDate(),
             end: moment(element.Etime, 'YYYY-MM-DDTHH:mm:ssZ').toDate(),
-            color: Constants.getColorbyName(color),
+            color: Constants.getColorbyName(element.Color),
             meta: {
               itemId: element.Itid,
               bookingType: element.BookingType,
@@ -139,9 +138,8 @@ export class GncBookingComponent implements OnInit, OnDestroy {
               eventPlace: element.EventPlace,
               otherPlace: element.OtherPlace,
               equipments: equpiments,
-              laptop: element.Laptop,
               otherRequirements: element.OtherRequirments,
-              remarks: element.Remarks,
+              purpose: element.Purpose,
               ispast: (new Date(element.Etime) > currentDate ? false : true)
             },
           }
@@ -179,13 +177,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
               flattenedMeta[`${nestedKey}`] = this.getDepartmentbyItemID(meta[key][nestedKey]);
             }
             else if (nestedKey == 'equipments') {
-              flattenedMeta[`${nestedKey}`] = meta[key][nestedKey].join(', ');
-            }
-            else if (nestedKey == 'laptop') {
-              if (meta.meta.bookingType == 'Activity Booking' && meta.meta.setUp == 'Fixed Setup')
-                flattenedMeta[`${nestedKey}`] = meta[key][nestedKey] == true ? 'Yes' : 'No';
-              else
-                flattenedMeta[`${nestedKey}`] = '';
+              flattenedMeta[`${nestedKey}`] = meta[key][nestedKey].join('</br>');
             }
             else if(nestedKey == 'eventPlace' && meta.meta.eventPlace == 'Other'){
               flattenedMeta[`${nestedKey}`] = 'Other - '+ meta.meta.otherPlace;
@@ -247,9 +239,8 @@ export class GncBookingComponent implements OnInit, OnDestroy {
           eventPlace: null,
           otherPlace: null,
           equipments: [],
-          laptop: null,
           otherRequirements: null,
-          remarks: null,
+          purpose: null,
         },
       }
   
@@ -360,10 +351,6 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       element.meta.equipments.forEach((e: string) => {
         data = `${data}\n${e}`;
       });
-      let laptoptxt = '';
-      if (element.meta.bookingType == 'Activity Booking' && element.meta.setUp == 'Fixed Setup') {
-        laptoptxt = element.meta.laptop == true ? 'Yes' : 'No';
-      }
       let event = {
         'Sr No': i,
         'Type': element.meta.bookingType,
@@ -373,10 +360,9 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         'Return/End DateTime': moment(element.end).format('DD-MM-YYYY hh:mm A'),
         'Set up': element.meta.setUp,
         'Event Place': element.meta.eventPlace == 'Other' ? 'Other - '+ element.meta.otherPlace : element.meta.eventPlace,
-        'Laptop': laptoptxt,
         'Equipments': data,
         'Other Requirements': element.meta.otherRequirements,
-        'Remarks/Purpose': element.meta.remarks,
+        'Purpose': element.meta.purpose,
       }
       exportDataList.push(event);
       i++;

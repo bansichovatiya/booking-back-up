@@ -63,19 +63,7 @@
                     <label for="otherPlace" class="input-group-text">Other Place*</label>
                     <input type="text" required class="form-control" id="otherPlace" [(ngModel)]="event.meta.otherPlace" [disabled]="action == 'view'">
                 </div>
-                <div class="input-group input-group-sm mb-3" aria-required="true" *ngIf="event.meta.setUp == gncSetUpList[0]">
-                    <label class="input-group-text">Laptop*</label>
-                    <select class="form-select" [(ngModel)]="event.meta.laptop" required [disabled]="action == 'view'">
-                        <option disabled selected value="">Select</option>
-                        <option [value]=true>Yes</option>
-                        <option [value]=false>No</option>
-                    </select>
-                </div>
-                <div class="input-group input-group-sm mb-3" *ngIf="event.meta.setUp == gncSetUpList[0]">
-                    <label for="otherRequirements" class="input-group-text">Any Other Requirements</label>
-                    <input type="text" required class="form-control" id="otherRequirements" [(ngModel)]="event.meta.otherRequirements" [disabled]="action == 'view'">
-                </div>
-                <div class="input-group input-group-sm mb-3" aria-required="true" *ngIf="event.meta.setUp == gncSetUpList[1]">
+                <div class="input-group input-group-sm mb-3" aria-required="true">
                     <label class="input-group-text">Equipment*</label>
                     <ng-multiselect-dropdown class="fmultiselect" 
                         [placeholder]="'Select Equipments'"
@@ -84,13 +72,20 @@
                         [settings]="equipmentsDropdownSettings"
                         [disabled]="action == 'view'"></ng-multiselect-dropdown>
                 </div>
+                <div class="input-group input-group-sm mb-3" *ngIf="event.meta.setUp == gncSetUpList[0]">
+                    <label for="otherRequirements" class="input-group-text">Any Other Requirements</label>
+                    <input type="text" required class="form-control" id="otherRequirements" [(ngModel)]="event.meta.otherRequirements" [disabled]="action == 'view'">
+                </div>
                 <div class="input-group input-group-sm mb-3" *ngIf="event.meta.setUp == gncSetUpList[1] && event.meta.equipments.includes('Other')">
                     <label for="otherRequirements" class="input-group-text">Other Requirements*</label>
                     <input type="text" required class="form-control" id="otherRequirements" [(ngModel)]="event.meta.otherRequirements" [disabled]="action == 'view'">
                 </div>
                 <div class="input-group input-group-sm mb-3">
-                    <label for="remarks" class="input-group-text">Remarks</label>
-                    <input type="text" required class="form-control" id="remarks" [(ngModel)]="event.meta.remarks" [disabled]="action == 'view'">
+                    <label for="purpose" class="input-group-text">Purpose*</label>
+                    <select class="form-select" [(ngModel)]="event.meta.purpose" required [disabled]="action == 'view'">
+                        <option disabled selected value="">Select</option>
+                        <option *ngFor="let item of purposeList" [value]="item">{{item}}</option>
+                    </select>
                 </div>
             </ng-container>
 
@@ -98,7 +93,7 @@
             <ng-container *ngIf="event.meta.bookingType == bookingTypeList[1]">
                 <div class="input-group input-group-sm mb-3">
                     <label for="purpose" class="input-group-text">Purpose*</label>
-                    <input type="text" required class="form-control" id="purpose" [(ngModel)]="event.meta.remarks" [disabled]="action == 'view'">
+                    <input type="text" required class="form-control" id="purpose" [(ngModel)]="event.meta.purpose" [disabled]="action == 'view'">
                 </div>
             </ng-container>
 

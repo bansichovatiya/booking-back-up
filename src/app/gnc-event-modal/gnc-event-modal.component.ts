@@ -26,6 +26,7 @@ export class GncEventModalComponent implements OnInit {
   jsonData: any = (data as any).default;
   eventPlaces: string[] = [];
   equipments: string[] = [];
+  purposeList: string[] = [];
   equipmentsDropdownSettings = {
     singleSelection: false,
     allowSearchFilter: true
@@ -51,6 +52,9 @@ export class GncEventModalComponent implements OnInit {
 
     if (this.event.meta.bookingType) {
       this.filterPlaceAndEquimpents();
+      if(this.event.meta.bookingType == this.bookingTypeList[2]){
+        this.purposeList = this.jsonData[this.event.meta.bookingType]["Purpose"];
+      }
     }
   }
 
@@ -142,21 +146,18 @@ export class GncEventModalComponent implements OnInit {
           else if (this.event.meta.eventPlace.includes('Other') && !this.event.meta.otherPlace) {
             this.showError('Other place is missing.');
           }
-          else if (this.event.meta.setUp == this.gncSetUpList[0] && this.event.meta.laptop == null) {
-            this.showError('Pleas enter the answer of Laptop field.');
-          }
-          else if (this.event.meta.setUp == this.gncSetUpList[1] && this.event.meta.equipments.length == 0) {
-            this.showError('Requirement of Equipment is missing.');
+          else if (this.event.meta.equipments.length == 0) {
+            this.showError('Please select the appropriate option in Equipments.');
           }
           else if (this.event.meta.setUp == this.gncSetUpList[1] && this.event.meta.equipments.includes('Other') && !this.event.meta.otherRequirements) {
             this.showError('Other Requirements is missing or unselect Other option from Equipments.');
-          }
+                    }
           else {
             isValidData = true;
           }
         }
         else if (this.event.meta.bookingType == this.bookingTypeList[1]) {
-          if (!this.event.meta.remarks) {
+          if (!this.event.meta.purpose) {
             this.showError('Purpose is missing.');
           }
           else {
@@ -165,7 +166,7 @@ export class GncEventModalComponent implements OnInit {
         }
         else if (this.event.meta.bookingType == this.bookingTypeList[0]) {
           if (this.event.meta.equipments.length == 0) {
-            this.showError('Requirement of Equipment is missing.');
+            this.showError('Please select the appropriate option in Equipments.');
           }
           else {
             isValidData = true;
@@ -180,7 +181,7 @@ export class GncEventModalComponent implements OnInit {
               ((otherEvent.start < this.event.start && this.event.start < otherEvent.end) ||
                 (otherEvent.start < this.event.end && this.event.start < otherEvent.end)));
           });
-          if (overlappingEvents) {
+          if (overlappingEvents.length > 0) {
             let conflict = false;
             overlappingEvents.forEach(overlappingEvent => {
               let conflictEventPlace = (overlappingEvent.meta.eventPlace == 'Other' && overlappingEvent.meta.otherPlace == this.event.meta.otherPlace) || (overlappingEvent.meta.eventPlace != 'Other' && this.event.meta.eventPlace != null && overlappingEvent.meta.eventPlace == this.event.meta.eventPlace);
@@ -237,7 +238,6 @@ export class GncEventModalComponent implements OnInit {
       case this.gncSetUpList[1]:
         this.eventPlaces = this.jsonData[this.bookingTypeList[2]][this.gncSetUpList[1]]["EventPlaces"];
         this.equipments = this.jsonData[this.bookingTypeList[2]][this.gncSetUpList[1]]["Equipments"];
-        this.event.meta.laptop = null;
         this.event.meta.eventPlace = null;
         this.event.meta.otherRequirements = null;
         this.event.meta.otherPlace = null;
@@ -259,11 +259,15 @@ export class GncEventModalComponent implements OnInit {
 
       // clear other data
       this.event.meta.setUp = null;
-      this.event.meta.laptop = null;
       this.event.meta.eventPlace = null;
       this.event.meta.otherRequirements = null;
       this.event.meta.otherPlace = null;
       this.event.meta.equipments = [];
+      this.event.meta.purpose = null;
+    }
+    else {
+      this.purposeList = this.jsonData[this.event.meta.bookingType]["Purpose"];
+      this.event.meta.purpose = null;
     }
     this.filterPlaceAndEquimpents();
   }
@@ -300,7 +304,7 @@ export class GncEventModalComponent implements OnInit {
             ((otherEvent.start < this.event.start && this.event.start < otherEvent.end) ||
               (otherEvent.start < this.event.end && this.event.start < otherEvent.end)));
         });
-        if (overlappingEvents) {
+        if (overlappingEvents.length > 0) {
           if (this.event.meta.setUp) {
             this.eventPlaces = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["EventPlaces"];
             this.equipments = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["Equipments"];

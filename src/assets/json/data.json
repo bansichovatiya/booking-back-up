@@ -8,7 +8,12 @@
                 "Sector 4 Community Hall",
                 "Amba School"
             ],
-            "Equipments" : []
+            "Equipments" : [
+                "HP - (GNC-LPT01)",
+                "Dell - (GNC-LPT02)",
+                "Lenovo - (GNC-LPT03)",
+                "Dell - (GNC-LPT04)"
+            ]
         },
         "Portable Setup": {
             "EventPlaces" :[
@@ -29,10 +34,14 @@
                 "Other"
             ],
             "Equipments" : [
-                "Laptop & Projector (Lenovo(3) & Vivitek(1) + Black long VGA cable + Audio Cable 1)",
-                "Laptop & Projector (Dell(2) & Dell(2) + LONG HDMI Cable - 1 (3 MTR) + Audio Cable 2",
-                "Laptop & Projector (Dell(4) & Yoton(3)+ LONG HDMI Cable - 1 (5 MTR) + Audio Cable 3",
-                "Laptop & Projector (HP(1) & Yoton (4) + White Long VGA Cable + Converter) + Audio Cable 4",
+                "HP - (GNC-LPT01)",
+                "Dell - (GNC-LPT02)",
+                "Lenovo - (GNC-LPT03)",
+                "Dell - (GNC-LPT04)",
+                "Projector (Vivitek(1) + Black long VGA cable + Audio Cable 1)",
+                "Projector (Dell(2) + LONG HDMI Cable - 1 (3 MTR) + Audio Cable 2)",
+                "Projector (Yoton(3) + LONG HDMI Cable - 1 (5 MTR) + Audio Cable 3)",
+                "Projector (Yoton(4) + White Long VGA Cable + Converter + Audio Cable 4)",
                 "Pignos 1 - with 9 valt batteries + Audio Cable 5",
                 "Pignos 2 - with AA batteries + Audio Cable 6",
                 "Pignos 3 - with AA batteries + Audio Cable 7",
@@ -46,7 +55,16 @@
                 "Cordless receiver System 1",
                 "Other"
             ]
-        }
+        },
+        "Purpose" :[
+            "Routine Session",
+            "Summer camp",
+            "Fusion",
+            "Workshop",
+            "Picnic",
+            "Parents meet",
+            "Get together"
+        ]
     },
     "GNC Basement Hall":{
         "EventPlaces" :[
@@ -60,7 +78,7 @@
             "HP - (GNC-LPT01)",
             "Dell - (GNC-LPT02)",
             "Lenovo - (GNC-LPT03)",
-            "Dell- (GNC-LPT04)"
+            "Dell - (GNC-LPT04)"
         ]
     }
 }
