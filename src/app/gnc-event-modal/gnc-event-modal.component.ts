@@ -313,7 +313,7 @@ export class GncEventModalComponent implements OnInit {
             this.eventPlaces = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["EventPlaces"];
             this.equipments = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["Equipments"];
           }
-          else {
+          else if (this.event.meta.bookingType != this.bookingTypeList[2]) {
             this.eventPlaces = this.jsonData[this.event.meta.bookingType]["EventPlaces"];
             this.equipments = this.jsonData[this.event.meta.bookingType]["Equipments"];
             if (this.eventPlaces) {
@@ -333,7 +333,7 @@ export class GncEventModalComponent implements OnInit {
           this.eventPlaces = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["EventPlaces"];
           this.equipments = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["Equipments"];
         }
-        else {
+        else if (this.event.meta.bookingType != this.bookingTypeList[2]) {
           this.eventPlaces = this.jsonData[this.event.meta.bookingType]["EventPlaces"];
           this.equipments = this.jsonData[this.event.meta.bookingType]["Equipments"];
           if (this.eventPlaces) {
