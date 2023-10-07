@@ -9,10 +9,10 @@
                 "Amba School"
             ],
             "Equipments" : [
-                "HP - (GNC-LPT01)",
-                "Dell - (GNC-LPT02)",
-                "Lenovo - (GNC-LPT03)",
-                "Dell - (GNC-LPT04)"
+                "Laptop No 1 (HP)",
+                "Laptop No 2 (Dell)",
+                "Laptop No 3 (Lenovo)",
+                "Laptop No 4 (Dell)"
             ]
         },
         "Portable Setup": {
@@ -34,25 +34,26 @@
                 "Other"
             ],
             "Equipments" : [
-                "HP - (GNC-LPT01)",
-                "Dell - (GNC-LPT02)",
-                "Lenovo - (GNC-LPT03)",
-                "Dell - (GNC-LPT04)",
-                "Projector (Vivitek(1) + Black long VGA cable + Audio Cable 1)",
-                "Projector (Dell(2) + LONG HDMI Cable - 1 (3 MTR) + Audio Cable 2)",
-                "Projector (Yoton(3) + LONG HDMI Cable - 1 (5 MTR) + Audio Cable 3)",
-                "Projector (Yoton(4) + White Long VGA Cable + Converter + Audio Cable 4)",
-                "Pignos 1 - with 9 valt batteries + Audio Cable 5",
-                "Pignos 2 - with AA batteries + Audio Cable 6",
-                "Pignos 3 - with AA batteries + Audio Cable 7",
-                "Crabtree",
+                "Laptop No 1 (HP)",
+                "Laptop No 2 (Dell)",
+                "Laptop No 3 (Lenovo)",
+                "Laptop No 4 (Dell)",
+                "Projector (Vivitek) + Black VGA cable + Audio Cable",
+                "Projector (Dell) + Long HDMI (3 MTR) + Audio Cable",
+                "Projector (Yoton 1) + Long HDMI (5 MTR) + Audio Cable",
+                "Projector (Yoton 2) + white VGA cable + Converter + Audio Cable",
+                "Small Extension board",
                 "Extension Board no -1",
                 "Extension Board no -2",
                 "Extension Board no -3",
-                "Long grey wire mic",
-                "Long red wire mic",
-                "GNV Event Sound system",
+                "Extension Board no -4",
+                "Long Grey wire mic",
+                "Long Red wire mic",
+                "Pignos 1 - with 9 Volt batteries + Audio Cable",
+                "Pignos 2 - with AA batteries + Audio Cable",
+                "Pignos 2 - with AA batteries + Audio Cable",
                 "Cordless receiver System 1",
+                "GNC Event Sound system",
                 "Other"
             ]
         },
@@ -75,10 +76,10 @@
     "Only Laptop":{
         "EventPlaces" :[],
         "Equipments" : [
-            "HP - (GNC-LPT01)",
-            "Dell - (GNC-LPT02)",
-            "Lenovo - (GNC-LPT03)",
-            "Dell - (GNC-LPT04)"
+            "Laptop No 1 (HP)",
+            "Laptop No 2 (Dell)",
+            "Laptop No 3 (Lenovo)",
+            "Laptop No 4 (Dell)"
         ]
     }
 }
