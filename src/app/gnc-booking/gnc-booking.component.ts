@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy, Chang
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarDateFormatter, CalendarEvent, CalendarEventTitleFormatter, CalendarMonthViewComponent, CalendarView, CalendarWeekViewComponent } from 'angular-calendar';
-import { addDays, addMinutes, differenceInBusinessDays, differenceInCalendarDays, isSameDay, isToday, startOfMinute } from 'date-fns';
+import { addDays, addHours, addMinutes, differenceInBusinessDays, differenceInCalendarDays, endOfMinute, isSameDay, isToday, startOfHour, startOfMinute } from 'date-fns';
 import { Subject } from 'rxjs'
 import { Cloneable } from '../helper/cloneable';
 import { BookingService } from '../provider/booking.service';
@@ -218,7 +218,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
   eventClicked({ event }: { event: CalendarEvent<any> }): void {
     const getdate = moment(event.end, 'YYYY-MM-DDTHH:mm:ssZ').toDate();
     const curdate = moment().toDate();
-    if (this.selectedItemId != this.allItemId && getdate >= curdate)
+    if ((this.view == 'List' || this.selectedItemId != this.allItemId) && getdate >= curdate)
       this.openEventModal(event, 'edit');
     else
       this.openEventModal(event, 'view');
@@ -230,7 +230,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         id: null,
         title: '',
         start: startOfMinute(date),
-        end: null,
+        end: addHours(startOfMinute(date), 1),
         color: Constants.getColorbyName(this.selectedColor),
         meta: {
           itemId: this.selectedItemId,
@@ -278,12 +278,11 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       else if (result == 'duplicate') {
         let duplicateEvent = Cloneable.deepCopy(event);
         duplicateEvent.id = null;
-        if(duplicateEvent.start > new Date()){
-          duplicateEvent.start = addDays(duplicateEvent.start, differenceInCalendarDays(duplicateEvent.start, new Date()));
-        }else{
-          duplicateEvent.start = addDays(duplicateEvent.start, differenceInCalendarDays(new Date(), duplicateEvent.start));
-        }
-        duplicateEvent.end = null;
+        let today = new Date();
+        let eventdays = differenceInCalendarDays(duplicateEvent.end, duplicateEvent.start);
+        duplicateEvent.start.setDate(today.getDate());
+        duplicateEvent.end = addDays(duplicateEvent.start, eventdays);
+        duplicateEvent.end.setHours(event.end.getHours(), event.end.getMinutes());
         this.openEventModal(duplicateEvent, 'add');
       }
       else if (result && action == 'add') {

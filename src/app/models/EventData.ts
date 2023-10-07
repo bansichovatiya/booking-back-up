@@ -13,9 +13,8 @@ export class EventData
     public eplace:string;
     public oplace:string;
     public equpiment:string
-    public lpt:string;
     public otherreq:string;
-    public remarks:string;
+    public purpose:string;
 
     constructor(event: CalendarEvent<any>){
         this.bdid = event.id;
@@ -28,8 +27,7 @@ export class EventData
         this.eplace = event.meta.eventPlace;
         this.oplace = event.meta.otherPlace;
         this.equpiment = event.meta.equipments.toString();
-        this.lpt = event.meta.laptop;
         this.otherreq = event.meta.otherRequirements;
-        this.remarks = event.meta.remarks;
+        this.purpose = event.meta.purpose;
     }
 }

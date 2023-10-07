@@ -151,7 +151,11 @@ export class GncEventModalComponent implements OnInit {
           }
           else if (this.event.meta.setUp == this.gncSetUpList[1] && this.event.meta.equipments.includes('Other') && !this.event.meta.otherRequirements) {
             this.showError('Other Requirements is missing or unselect Other option from Equipments.');
-                    }
+          }
+          else if (!this.event.meta.purpose) {
+            this.showError('Please select the appropriate option in Purpose.');
+          }
+          
           else {
             isValidData = true;
           }
