@@ -117,7 +117,7 @@
         </ng-container>
     </div>
     <div class="modal-footer" *ngIf="event.meta.bookingType != null">
-        <button type="submit" class="btn btn-primary" *ngIf ="action == 'view' || action == 'edit'"(click)="passBack('duplicate')"
+        <button type="submit" class="btn btn-primary" *ngIf ="selectedItemId != 0 && (action == 'view' || action == 'edit')" (click)="passBack('duplicate')"
         data-toggle="tooltip" data-placement="top" title="Change the date first after duplicating the event.">Duplicate</button>
         <button type="submit" class="btn btn-danger" *ngIf="action == 'edit'" (click)="openModel(deleteConfirmModel)">Delete</button>
         <button type="submit" class="btn btn-success" *ngIf ="action == 'add' || action == 'edit'"  (click)="passBack('save')">Save</button>

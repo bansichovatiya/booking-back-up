@@ -49,7 +49,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
   selectedType: any;
   message = '';
   messageType = '';
-  eventTypes: any;
+  eventTypes: any[] = [{"Itid": 0,"Type": "GNC", "Name": "All (View Only)", "Color": "blue", "Category": "GNC", "IsActive": true, "StartHour": 9}];
   isrepeat: boolean = false;
   bookingDetails: any;
   daysInWeek = 7;
@@ -64,6 +64,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
   calendarConfig = {
     weekStartsOn: 1 // Monday is the first day of the week
   };
+  allItemId = 0;
 
   constructor(private modalService: NgbModal,
     private bookinService: BookingService,
@@ -73,7 +74,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
     private excelExportService: IgxExcelExporterService) { }
 
   ngOnInit(): void {
-    if (!this.eventTypes)
+    if (this.eventTypes.length == 1)
       this.getBookingType();
   }
 
@@ -89,14 +90,19 @@ export class GncBookingComponent implements OnInit, OnDestroy {
   }
 
   async OnTypeChange(type) {
-    await this.bookinService.GetBookingType(type, this.category).subscribe((data) => {
-      this.eventTypes = data;
-      this.starthour = this.eventTypes[0].StartHour;
-      this.selectedItemId = this.eventTypes[0].Itid;
-      this.selectedName = this.eventTypes[0].Name;
-      this.selectedColor = this.eventTypes[0].Color;
-      this.events = [];
-      this.getBookingDetails();
+    await this.bookinService.GetBookingType(type, this.category).subscribe((data: any[]) => {
+      if(data.length > 0){
+        data.forEach((element) => {
+          this.eventTypes.push(element);
+        });
+        this.starthour = this.eventTypes[0].StartHour;
+        this.selectedItemId = this.eventTypes[0].Itid;
+        this.selectedName = this.eventTypes[0].Name;
+        this.selectedColor = this.eventTypes[0].Color;
+        this.events = [];
+        this.eventsByItemId = [];
+        this.getBookingDetails();
+      }
     });
   }
 
@@ -105,6 +111,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
     this.selectedColor = this.eventTypes.find(t => t.Name == name).Color;
     this.selectedItemId = this.eventTypes.find(t => t.Name == name).Itid;
     this.events = [];
+    this.eventsByItemId = [];
     this.getBookingDetails();
   }
 
@@ -117,13 +124,14 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       if (this.bookingDetails.length > 0) {
         this.bookingDetails.forEach((element) => {
           let equpiments: string[] = element.Equipments ? element.Equipments.split(',') : [];
+          let color = this.eventTypes.find((t: { Itid: number; }) => t.Itid == element.Itid).Color;
           let currentDate = new Date();
           let event: CalendarEvent<any> = {
             id: element.bdid,
             title: element.Person_Name,
             start: moment(element.Stime, 'YYYY-MM-DDTHH:mm:ssZ').toDate(),
             end: moment(element.Etime, 'YYYY-MM-DDTHH:mm:ssZ').toDate(),
-            color: Constants.getColorbyName(this.selectedColor),
+            color: Constants.getColorbyName(color),
             meta: {
               itemId: element.Itid,
               bookingType: element.BookingType,
@@ -141,7 +149,13 @@ export class GncBookingComponent implements OnInit, OnDestroy {
           const flattenedElement = this.flattenMeta(event);
           this.listDetials.push(flattenedElement);
         });
-        this.eventsByItemId = this.events.filter(e => e.meta.itemId == ItemId);
+
+        if(this.selectedItemId != this.allItemId){
+          this.eventsByItemId = this.events.filter(e => e.meta.itemId == ItemId);
+        }
+        else{
+          this.eventsByItemId = this.events;
+        }
       }
       else {
         this.events = [];
@@ -212,48 +226,48 @@ export class GncBookingComponent implements OnInit, OnDestroy {
   eventClicked({ event }: { event: CalendarEvent<any> }): void {
     const getdate = moment(event.end, 'YYYY-MM-DDTHH:mm:ssZ').toDate();
     const curdate = moment().toDate();
-    if (getdate >= curdate)
+    if (this.selectedItemId != this.allItemId && getdate >= curdate)
       this.openEventModal(event, 'edit');
     else
       this.openEventModal(event, 'view');
   }
 
   hourSegmentClicked(date: Date) {
-    let newEvent: CalendarEvent<any> = {
-      id: null,
-      title: '',
-      start: startOfMinute(date),
-      end: null,
-      color: Constants.getColorbyName(this.selectedColor),
-      meta: {
-        itemId: this.selectedItemId,
-        bookingType: null,
-        setUp: null,
-        eventPlace: null,
-        otherPlace: null,
-        equipments: [],
-        laptop: null,
-        otherRequirements: null,
-        remarks: null,
-      },
+    if(this.selectedItemId != this.allItemId){
+      let newEvent: CalendarEvent<any> = {
+        id: null,
+        title: '',
+        start: startOfMinute(date),
+        end: null,
+        color: Constants.getColorbyName(this.selectedColor),
+        meta: {
+          itemId: this.selectedItemId,
+          bookingType: null,
+          setUp: null,
+          eventPlace: null,
+          otherPlace: null,
+          equipments: [],
+          laptop: null,
+          otherRequirements: null,
+          remarks: null,
+        },
+      }
+  
+      const getdate = moment(newEvent.start, 'YYYY-MM-DDTHH:mm:ssZ').toDate();
+      const curdate = moment().toDate();
+  
+      if (getdate >= curdate)
+        this.openEventModal(newEvent, 'add');
+      else
+        alert('Past times can not be added or edited.');
     }
-
-    const getdate = moment(newEvent.start, 'YYYY-MM-DDTHH:mm:ssZ').toDate();
-    const curdate = moment().toDate();
-
-    if (getdate >= curdate)
-      this.openEventModal(newEvent, 'add');
-    else
-      alert('Past times can not be added or edited.');
   };
 
   openEventModal(event: CalendarEvent<any>, action: string) {
     let deepCopyEvent = Cloneable.deepCopy(event);
     const modalRef = this.modalService.open(GncEventModalComponent, { backdrop: 'static', keyboard: false });
+    modalRef.componentInstance.selectedItemId = this.selectedItemId;
     modalRef.componentInstance.event = deepCopyEvent;
-    modalRef.componentInstance.selectedType = this.selectedType;
-    modalRef.componentInstance.selectedName = this.selectedName;
-    modalRef.componentInstance.selectedColor = this.selectedColor;
     modalRef.componentInstance.eventList = this.events;
     modalRef.componentInstance.action = action;
     modalRef.componentInstance.startHour = this.starthour;

@@ -13,19 +13,13 @@ import { isSameDay } from 'date-fns';
 })
 
 export class GncEventModalComponent implements OnInit {
-  @Input()
-  public event!: CalendarEvent<any>;
+  @Input() public event!: CalendarEvent<any>;
+  @Input() selectedItemId: any;
+  @Input() eventList!: any[];
+  @Input() action: any;
+  @Input()startHour!: number;
   public startTime!: string;
   public endTime!: string;
-  @Input() selectedEvent: any;
-  @Input()
-  selectedType!: string;
-  @Input() selectedColor: any;
-  @Input()
-  eventList!: any[];
-  @Input() action: any;
-  @Input()
-  startHour!: number;
   validationmsg: any;
   bookingTypeList: string[] = ["Only Laptop", "GNC Basement Hall", "Activity Booking"];
   gncSetUpList: string[] = ["Fixed Setup", "Portable Setup"];
