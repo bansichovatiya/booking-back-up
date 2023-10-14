@@ -31,7 +31,7 @@ export class GncEventModalComponent implements OnInit {
     singleSelection: false,
     allowSearchFilter: true
   };
-  onlyLaptopEquipmentsDropdownSettings = {
+  sigleSelectEquipmentsDropdownSettings = {
     singleSelection: false,
     allowSearchFilter: true,
     enableCheckAll: false,
@@ -68,6 +68,8 @@ export class GncEventModalComponent implements OnInit {
               this.event.meta.otherPlace = null;
             if (this.event.meta.setUp == this.gncSetUpList[1] && !this.event.meta.equipments.includes("Other"))
               this.event.meta.otherRequirements = null;
+            if (this.event.meta.purpose != "Other")
+              this.event.meta.otherPurpose = null;
           }
           this.activeModal.close(this.event);
         }
@@ -141,10 +143,10 @@ export class GncEventModalComponent implements OnInit {
             this.showError('Set up is missing.');
           }
           else if (!this.event.meta.eventPlace) {
-            this.showError('Event place is missing.');
+            this.showError('Event Place is missing.');
           }
-          else if (this.event.meta.eventPlace.includes('Other') && !this.event.meta.otherPlace) {
-            this.showError('Other place is missing.');
+          else if (this.event.meta.eventPlace == 'Other' && !this.event.meta.otherPlace) {
+            this.showError('Other Place is missing or select another option from Event Place.');
           }
           else if (this.event.meta.equipments.length == 0) {
             this.showError('Please select the appropriate option in Equipments.');
@@ -155,7 +157,9 @@ export class GncEventModalComponent implements OnInit {
           else if (!this.event.meta.purpose) {
             this.showError('Please select the appropriate option in Purpose.');
           }
-          
+          else if (this.event.meta.purpose == 'Other' && !this.event.meta.otherPurpose) {
+            this.showError('Other Purpose is missing or select another option from Purpose.');
+          }          
           else {
             isValidData = true;
           }

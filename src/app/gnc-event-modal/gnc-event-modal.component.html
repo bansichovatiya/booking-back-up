@@ -63,13 +63,22 @@
                     <label for="otherPlace" class="input-group-text">Other Place*</label>
                     <input type="text" required class="form-control" id="otherPlace" [(ngModel)]="event.meta.otherPlace" [disabled]="action == 'view'">
                 </div>
-                <div class="input-group input-group-sm mb-3" aria-required="true">
-                    <label class="input-group-text">Equipment*</label>
+                <div class="input-group input-group-sm mb-3" aria-required="true" *ngIf="event.meta.setUp == gncSetUpList[1]">
+                    <label class="input-group-text">Equipments*</label>
                     <ng-multiselect-dropdown class="fmultiselect" 
                         [placeholder]="'Select Equipments'"
                         [data]="equipments"
                         [(ngModel)]="event.meta.equipments"
                         [settings]="equipmentsDropdownSettings"
+                        [disabled]="action == 'view'"></ng-multiselect-dropdown>
+                </div>
+                <div class="input-group input-group-sm mb-3" aria-required="true" *ngIf="event.meta.setUp == gncSetUpList[0]">
+                    <label class="input-group-text">Equipments*</label>
+                    <ng-multiselect-dropdown class="fmultiselect" 
+                        [placeholder]="'Select Equipments'"
+                        [data]="equipments"
+                        [(ngModel)]="event.meta.equipments"
+                        [settings]="sigleSelectEquipmentsDropdownSettings"
                         [disabled]="action == 'view'"></ng-multiselect-dropdown>
                 </div>
                 <div class="input-group input-group-sm mb-3" *ngIf="event.meta.setUp == gncSetUpList[0]">
@@ -86,6 +95,10 @@
                         <option disabled selected value="">Select</option>
                         <option *ngFor="let item of purposeList" [value]="item">{{item}}</option>
                     </select>
+                </div>
+                <div class="input-group input-group-sm mb-3" *ngIf="event.meta.purpose == 'Other'">
+                    <label for="otherPurpose" class="input-group-text">Other Purpose*</label>
+                    <input type="text" required class="form-control" id="otherPurpose" [(ngModel)]="event.meta.otherPurpose" [disabled]="action == 'view'">
                 </div>
             </ng-container>
 
@@ -105,7 +118,7 @@
                         [placeholder]="'Select Equipments'"
                         [data]="equipments"
                         [(ngModel)]="event.meta.equipments"
-                        [settings]=" onlyLaptopEquipmentsDropdownSettings"
+                        [settings]=" sigleSelectEquipmentsDropdownSettings"
                         [disabled]="action == 'view'"></ng-multiselect-dropdown>
                 </div>
             </ng-container>

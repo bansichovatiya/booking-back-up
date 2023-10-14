@@ -15,6 +15,7 @@ export class EventData
     public equpiment:string
     public otherreq:string;
     public purpose:string;
+    public otherpurpose:string;
 
     constructor(event: CalendarEvent<any>){
         this.bdid = event.id;
@@ -29,5 +30,6 @@ export class EventData
         this.equpiment = event.meta.equipments.toString();
         this.otherreq = event.meta.otherRequirements;
         this.purpose = event.meta.purpose;
+        this.otherpurpose = event.meta.otherPurpose;
     }
 }

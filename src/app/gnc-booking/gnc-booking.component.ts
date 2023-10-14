@@ -140,6 +140,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
               equipments: equpiments,
               otherRequirements: element.OtherRequirments,
               purpose: element.Purpose,
+              otherPurpose: element.OtherPurpose,
               ispast: (new Date(element.Etime) > currentDate ? false : true)
             },
           }
@@ -181,6 +182,9 @@ export class GncBookingComponent implements OnInit, OnDestroy {
             }
             else if(nestedKey == 'eventPlace' && meta.meta.eventPlace == 'Other'){
               flattenedMeta[`${nestedKey}`] = 'Other - '+ meta.meta.otherPlace;
+            }
+            else if(nestedKey == 'purpose' && meta.meta.purpose == 'Other'){
+              flattenedMeta[`${nestedKey}`] = 'Other - '+ meta.meta.otherPurpose;
             }
             else {
               flattenedMeta[`${nestedKey}`] = meta[key][nestedKey];
@@ -241,6 +245,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
           equipments: [],
           otherRequirements: null,
           purpose: null,
+          otherPurpose: null,
         },
       }
   
@@ -287,6 +292,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       }
       else if (result && action == 'add') {
         let eventData = new EventData(result);
+        eventData["department"] = this.getDepartmentbyItemID(Number(eventData.itemid));
         this.bookinService.InsertGNCBookingDetails(eventData)
           .subscribe((data: EventData[]) => {
             if (data && data.length > 0) {
@@ -361,7 +367,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         'Event Place': element.meta.eventPlace == 'Other' ? 'Other - '+ element.meta.otherPlace : element.meta.eventPlace,
         'Equipments': data,
         'Other Requirements': element.meta.otherRequirements,
-        'Purpose': element.meta.purpose,
+        'Purpose': element.meta.purpose == 'Other' ? 'Other - '+ element.meta.otherPurpose : element.meta.purpose,
       }
       exportDataList.push(event);
       i++;
