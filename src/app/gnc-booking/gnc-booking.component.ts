@@ -65,6 +65,9 @@ export class GncBookingComponent implements OnInit, OnDestroy {
     weekStartsOn: 1 // Monday is the first day of the week
   };
   allItemId = 0;
+  allEventPlaces: any[];
+  allEquipments: any[];
+  allPurposeList: any[];
 
   constructor(private modalService: NgbModal,
     private bookinService: BookingService,
@@ -74,8 +77,17 @@ export class GncBookingComponent implements OnInit, OnDestroy {
     private excelExportService: IgxExcelExporterService) { }
 
   ngOnInit(): void {
+    this.getGNCBookingTypeData();
     if (this.eventTypes.length == 1)
       this.getBookingType();
+  }
+
+  async getGNCBookingTypeData(){
+    await this.bookinService.GetGNCBookingType().subscribe((data: any[]) => {
+      this.allEventPlaces = data.filter(x => x.Detail == "EventPlaces");
+      this.allEquipments = data.filter(x => x.Detail == "Equipments");
+      this.allPurposeList = data.filter(x => x.Detail == "Purpose");
+    });
   }
 
   async getBookingType() {
@@ -267,6 +279,10 @@ export class GncBookingComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.eventList = this.events;
     modalRef.componentInstance.action = action;
     modalRef.componentInstance.startHour = this.starthour;
+    modalRef.componentInstance.allEventPlaces = this.allEventPlaces;
+    modalRef.componentInstance.allEquipments = this.allEquipments;
+    modalRef.componentInstance.allPurposeList = this.allPurposeList;
+
     modalRef.result.then((result) => {
       if (result == 'delete') {
         this.eventsByItemId = this.eventsByItemId.filter((e) => e !== event);

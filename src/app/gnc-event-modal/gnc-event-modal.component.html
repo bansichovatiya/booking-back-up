@@ -65,20 +65,20 @@
                 </div>
                 <div class="input-group input-group-sm mb-3" aria-required="true" *ngIf="event.meta.setUp == gncSetUpList[1]">
                     <label class="input-group-text">Equipments*</label>
-                    <ng-multiselect-dropdown class="fmultiselect" 
+                    <ng-multiselect-dropdown class="fmultiselect"
+                        [settings]="equipmentsDropdownSettings"
                         [placeholder]="'Select Equipments'"
                         [data]="equipments"
                         [(ngModel)]="event.meta.equipments"
-                        [settings]="equipmentsDropdownSettings"
                         [disabled]="action == 'view'"></ng-multiselect-dropdown>
                 </div>
                 <div class="input-group input-group-sm mb-3" aria-required="true" *ngIf="event.meta.setUp == gncSetUpList[0]">
                     <label class="input-group-text">Equipments*</label>
-                    <ng-multiselect-dropdown class="fmultiselect" 
+                    <ng-multiselect-dropdown class="fmultiselect"
+                        [settings]="singleSelectEquipmentsDropdownSettings"
                         [placeholder]="'Select Equipments'"
                         [data]="equipments"
                         [(ngModel)]="event.meta.equipments"
-                        [settings]="sigleSelectEquipmentsDropdownSettings"
                         [disabled]="action == 'view'"></ng-multiselect-dropdown>
                 </div>
                 <div class="input-group input-group-sm mb-3" *ngIf="event.meta.setUp == gncSetUpList[0]">
@@ -114,11 +114,11 @@
             <ng-container *ngIf="event.meta.bookingType == bookingTypeList[0]">
                 <div class="input-group input-group-sm mb-3" aria-required="true">
                     <label class="input-group-text">Equipment*</label>
-                    <ng-multiselect-dropdown class="fmultiselect" 
+                    <ng-multiselect-dropdown class="fmultiselect"
+                        [settings]="singleSelectEquipmentsDropdownSettings"
                         [placeholder]="'Select Equipments'"
                         [data]="equipments"
                         [(ngModel)]="event.meta.equipments"
-                        [settings]=" sigleSelectEquipmentsDropdownSettings"
                         [disabled]="action == 'view'"></ng-multiselect-dropdown>
                 </div>
             </ng-container>

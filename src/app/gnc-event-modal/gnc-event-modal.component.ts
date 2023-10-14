@@ -17,24 +17,34 @@ export class GncEventModalComponent implements OnInit {
   @Input() selectedItemId: any;
   @Input() eventList!: any[];
   @Input() action: any;
-  @Input()startHour!: number;
-  public startTime!: string;
-  public endTime!: string;
+  @Input() startHour!: number;
+  @Input() allEventPlaces: any[];
+  @Input() allEquipments: any[];
+  @Input() allPurposeList: any[];
+  // eventPlaceOtherID = 18;
+  // equipmentOtherID = 39;
+  // purposeOtherID = 47;
+  startTime!: string;
+  endTime!: string;
   validationmsg: any;
   bookingTypeList: string[] = ["Only Laptop", "GNC Basement Hall", "Activity Booking"];
   gncSetUpList: string[] = ["Fixed Setup", "Portable Setup"];
   jsonData: any = (data as any).default;
-  eventPlaces: string[] = [];
-  equipments: string[] = [];
-  purposeList: string[] = [];
+  eventPlaces: any[] = [];
+  equipments: any[] = [];
+  purposeList: any[] = [];
   equipmentsDropdownSettings = {
     singleSelection: false,
-    allowSearchFilter: true
+    allowSearchFilter: true,
+    // idField: 'ID',
+    // textField: 'Name',
   };
-  sigleSelectEquipmentsDropdownSettings = {
+  singleSelectEquipmentsDropdownSettings = {
     singleSelection: false,
     allowSearchFilter: true,
     enableCheckAll: false,
+    // idField: 'ID',
+    // textField: 'Name',
   };
 
   constructor(
@@ -53,7 +63,7 @@ export class GncEventModalComponent implements OnInit {
     if (this.event.meta.bookingType) {
       this.filterPlaceAndEquimpents();
       if(this.event.meta.bookingType == this.bookingTypeList[2]){
-        this.purposeList = this.jsonData[this.event.meta.bookingType]["Purpose"];
+        this.purposeList = this.allPurposeList.filter(x=> x.Type == this.event.meta.setUp).map(x => x.Name);
       }
     }
   }
@@ -235,116 +245,71 @@ export class GncEventModalComponent implements OnInit {
   }
 
   onSetUpChanged() {
-    switch (this.event.meta.setUp) {
-      case this.gncSetUpList[0]:
-        this.eventPlaces = this.jsonData[this.bookingTypeList[2]][this.gncSetUpList[0]]["EventPlaces"];
-        this.event.meta.eventPlace = null;
-        this.event.meta.otherRequirements = null;
-        this.event.meta.otherPlace = null;
-        this.event.meta.equipments = [];
-        break;
-      case this.gncSetUpList[1]:
-        this.eventPlaces = this.jsonData[this.bookingTypeList[2]][this.gncSetUpList[1]]["EventPlaces"];
-        this.equipments = this.jsonData[this.bookingTypeList[2]][this.gncSetUpList[1]]["Equipments"];
-        this.event.meta.eventPlace = null;
-        this.event.meta.otherRequirements = null;
-        this.event.meta.otherPlace = null;
-        this.event.meta.equipments = [];
-        break;
-      default:
-        this.eventPlaces = [];
-        this.equipments = [];
-        break;
-    }
+    this.event.meta.eventPlace = null;
+    this.event.meta.otherRequirements = null;
+    this.event.meta.otherPlace = null;
+    this.event.meta.equipments = [];
+    this.purposeList = this.allPurposeList.filter(x=> x.Type == this.event.meta.setUp).map(x => x.Name);
     this.filterPlaceAndEquimpents();
   }
 
   onBookingTypeChanged() {
     // When type is not Activity Booking
     if (this.event.meta.bookingType != this.bookingTypeList[2]) {
-      this.eventPlaces = this.jsonData[this.event.meta.bookingType]["EventPlaces"];
-      this.equipments = this.jsonData[this.event.meta.bookingType]["Equipments"];
-
       // clear other data
       this.event.meta.setUp = null;
       this.event.meta.eventPlace = null;
-      this.event.meta.otherRequirements = null;
       this.event.meta.otherPlace = null;
+      this.event.meta.otherRequirements = null;
       this.event.meta.equipments = [];
       this.event.meta.purpose = null;
+      this.event.meta.otherPurpose = null;
     }
     else {
-      this.purposeList = this.jsonData[this.event.meta.bookingType]["Purpose"];
       this.event.meta.purpose = null;
     }
     this.filterPlaceAndEquimpents();
   }
 
   filterPlaceAndEquimpents() {
-    let newStartTime = this.startTime.split(':');
-    if (this.endTime) {
-      if(this.event.meta.bookingType != this.bookingTypeList[1]){
-        let timeString1 = '11:00';
-        let timeString2 = '19:00';
-        let time1 = new Date('1970-01-01T' + timeString1);
-        let time2 = new Date('1970-01-01T' + timeString2);
-        let time3 = new Date('1970-01-01T' + this.endTime);
-        if (time3 >= time1 && time3 <= time2) {
-        }
-        else {
-          this.showError('Return time should be within 11 AM to 07 PM.');
+    // For GNC Basement Hall start and end date will same.
+    if(this.event.meta.bookingType == this.bookingTypeList[1] && !isSameDay(this.event.start, this.event.end)){
+      this.event.end = new Date(this.event.start);
+    }
+
+    if (this.event.start && this.event.end) {
+      let newStartTime = this.startTime.split(':');
+      let newEndTime = this.endTime.split(':');
+      this.event.start.setHours(Number(newStartTime[0]), Number(newStartTime[1]), 0);
+      this.event.end.setHours(Number(newEndTime[0]), Number(newEndTime[1]), 0);
+      const eventid = this.event.id;
+      const overlappingEvents = this.eventList.filter((otherEvent: CalendarEvent<any>) => {
+        return (
+          otherEvent !== this.event && otherEvent.id != eventid && !otherEvent.allDay && otherEvent.end && this.event.end &&
+          ((otherEvent.start < this.event.start && this.event.start < otherEvent.end) ||
+            (otherEvent.start < this.event.end && this.event.start < otherEvent.end)));
+      });
+
+      if (this.event.meta.setUp) {
+        this.eventPlaces = this.allEventPlaces.filter(x=> x.Type == this.event.meta.setUp).map(x => x.Name);
+        this.equipments = this.allEquipments.filter(x=> x.Type == this.event.meta.setUp).map(x => x.Name);
+      }
+      else if (this.event.meta.bookingType != this.bookingTypeList[2]) {
+        this.eventPlaces = this.allEventPlaces.filter(x=> x.Type == this.event.meta.bookingType).map(x => x.Name);
+        this.equipments = this.allEquipments.filter(x=> x.Type == this.event.meta.bookingType).map(x => x.Name);
+        if (this.eventPlaces) {
+          if (this.eventPlaces.length == 1)
+            this.event.meta.eventPlace = this.eventPlaces[0];
         }
       }
 
-      // For GNC Basement Hall start and end date will same.
-      if(this.event.meta.bookingType == this.bookingTypeList[1] && !isSameDay(this.event.start, this.event.end)){
-        this.event.end = new Date(this.event.start);
-      }
-
-      if (this.event.start && this.event.end) {
-        let newEndTime = this.endTime.split(':');
-        this.event.start.setHours(Number(newStartTime[0]), Number(newStartTime[1]), 0);
-        this.event.end.setHours(Number(newEndTime[0]), Number(newEndTime[1]), 0);
-        const eventid = this.event.id;
-        const overlappingEvents = this.eventList.filter((otherEvent: CalendarEvent<any>) => {
-          return (
-            otherEvent !== this.event && otherEvent.id != eventid && !otherEvent.allDay && otherEvent.end && this.event.end &&
-            ((otherEvent.start < this.event.start && this.event.start < otherEvent.end) ||
-              (otherEvent.start < this.event.end && this.event.start < otherEvent.end)));
+      if (overlappingEvents.length > 0) {
+        overlappingEvents.forEach(overlappingEvent => {
+          if (overlappingEvent.meta.eventPlace != 'Other') {
+            this.eventPlaces = this.eventPlaces.filter(p => p != overlappingEvent.meta.eventPlace);
+          }
+          this.equipments = this.equipments.filter(p => overlappingEvent.meta.equipments.every((i: any) => (i == 'Other' || i != p)));
         });
-        if (overlappingEvents.length > 0) {
-          if (this.event.meta.setUp) {
-            this.eventPlaces = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["EventPlaces"];
-            this.equipments = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["Equipments"];
-          }
-          else if (this.event.meta.bookingType != this.bookingTypeList[2]) {
-            this.eventPlaces = this.jsonData[this.event.meta.bookingType]["EventPlaces"];
-            this.equipments = this.jsonData[this.event.meta.bookingType]["Equipments"];
-            if (this.eventPlaces) {
-              if (this.eventPlaces.length == 1)
-                this.event.meta.eventPlace = this.eventPlaces[0];
-            }
-          }
-
-          overlappingEvents.forEach(overlappingEvent => {
-            if (overlappingEvent.meta.eventPlace != 'Other') {
-              this.eventPlaces = this.eventPlaces.filter(p => p != overlappingEvent.meta.eventPlace);
-            }
-            this.equipments = this.equipments.filter(p => overlappingEvent.meta.equipments.every((i: string) => (i == 'Other' || i != p)));
-          });
-        }
-        else if (this.event.meta.setUp) {
-          this.eventPlaces = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["EventPlaces"];
-          this.equipments = this.jsonData[this.event.meta.bookingType][this.event.meta.setUp]["Equipments"];
-        }
-        else if (this.event.meta.bookingType != this.bookingTypeList[2]) {
-          this.eventPlaces = this.jsonData[this.event.meta.bookingType]["EventPlaces"];
-          this.equipments = this.jsonData[this.event.meta.bookingType]["Equipments"];
-          if (this.eventPlaces) {
-            if (this.eventPlaces.length == 1)
-              this.event.meta.eventPlace = this.eventPlaces[0];
-          }
-        }
       }
     }
   }

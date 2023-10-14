@@ -58,6 +58,13 @@ export class BookingService {
     )
   }
 
+  // Get Event place, equipment and purpose list
+  GetGNCBookingType(){
+    return this.http.get((this.apiUrl + 'getgncbookingtype')).pipe(map(data => {
+      return data;
+    }))
+  }
+
   GetGNCBookingDetails(itemid: string) {
     let myParams = new HttpParams().set('itemid', itemid);
     return this.http.get((this.apiUrl + 'getgncbookingdetails'), { params: myParams }).pipe(map(data => {
