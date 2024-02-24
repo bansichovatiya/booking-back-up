@@ -16,6 +16,7 @@ export class EventData
     public otherreq:string;
     public purpose:string;
     public otherpurpose:string;
+    public isfixedsetup:boolean;
 
     constructor(event: CalendarEvent<any>){
         this.bdid = event.id;
@@ -31,5 +32,6 @@ export class EventData
         this.otherreq = event.meta.otherRequirements;
         this.purpose = event.meta.purpose;
         this.otherpurpose = event.meta.otherPurpose;
+        this.isfixedsetup = event.meta.isFixedSetup;
     }
 }

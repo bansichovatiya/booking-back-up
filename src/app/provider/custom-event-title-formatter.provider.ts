@@ -15,10 +15,12 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
     let endDate = event.end != null ? "End - " + formatDate(event.end, 'dd-MM-yyyy hh:mm a', this.locale) : '';
     let data  = event.meta.bookingType == 'Activity Booking'? `${event.meta.setUp}<br>
                   ${event.meta.eventPlace == 'Other' ? 'Other - '+ event.meta.otherPlace : event.meta.eventPlace}` : '';
+    let items = event.meta.equipments.filter(x=> x.includes("Laptop")).join('</br>');
     return `<b>${event.title}</b> (${event.meta.bookingType})<br>
             ${startDate}<br>
             ${endDate}<br>
-            ${data}`;
+            ${data}<br>
+            ${items}`;
   }
 
   day(event: CalendarEvent): string {
@@ -26,9 +28,11 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
     let endDate = event.end != null ? "End - " + formatDate(event.end, 'dd-MM-yyyy hh:mm a', this.locale) : '';
     let data  = event.meta.bookingType == 'Activity Booking'? `${event.meta.setUp}<br>
                   ${event.meta.eventPlace == 'Other' ? 'Other - '+ event.meta.otherPlace : event.meta.eventPlace}` : '';
+    let items = event.meta.equipments.filter(x=> x.includes("Laptop")).join('</br>');
     return `<b>${event.title}</b> (${event.meta.bookingType})<br>
             ${startDate}<br>
             ${endDate}<br>
-            ${data}`;
+            ${data}<br>
+            ${items}`;
   }
 }

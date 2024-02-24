@@ -8,7 +8,7 @@ import { EventData } from '../models/EventData';
 })
 export class BookingService {
 
-  apiUrl: any = 'http://mhtapitest.dadabhagwan.org/api/booking/';
+  apiUrl: any = 'https://mhtapitest.dadabhagwan.org/api/booking/';
 
   constructor(private http: HttpClient) { }
 

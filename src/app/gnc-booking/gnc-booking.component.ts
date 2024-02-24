@@ -153,6 +153,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
               otherRequirements: element.OtherRequirments,
               purpose: element.Purpose,
               otherPurpose: element.OtherPurpose,
+              isFixedSetup: element.IsFixedSetup,
               ispast: (new Date(element.Etime) > currentDate ? false : true)
             },
           }
@@ -197,6 +198,9 @@ export class GncBookingComponent implements OnInit, OnDestroy {
             }
             else if(nestedKey == 'purpose' && meta.meta.purpose == 'Other'){
               flattenedMeta[`${nestedKey}`] = 'Other - '+ meta.meta.otherPurpose;
+            }
+            else if(nestedKey == 'isFixedSetup' && meta.meta.isFixedSetup != null){
+              flattenedMeta[`${nestedKey}`] = meta.meta.isFixedSetup ? 'Yes' : 'No';
             }
             else {
               flattenedMeta[`${nestedKey}`] = meta[key][nestedKey];
@@ -258,6 +262,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
           otherRequirements: null,
           purpose: null,
           otherPurpose: null,
+          isFixedSetup: null
         },
       }
   
@@ -368,10 +373,12 @@ export class GncBookingComponent implements OnInit, OnDestroy {
     let i = 1;
     this.events.forEach(element => {
       let department = this.getDepartmentbyItemID(element.meta.itemId);
+      let fixedSetup = element.meta.isFixedSetup != null ? (element.meta.isFixedSetup ? 'Yes' : 'No') : null;
       let data = ``;
       element.meta.equipments.forEach((e: string) => {
         data = `${data}\n${e}`;
       });
+
       let event = {
         'Sr No': i,
         'Type': element.meta.bookingType,
@@ -384,6 +391,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
         'Equipments': data,
         'Other Requirements': element.meta.otherRequirements,
         'Purpose': element.meta.purpose == 'Other' ? 'Other - '+ element.meta.otherPurpose : element.meta.purpose,
+        'Fixed Setup': fixedSetup,
       }
       exportDataList.push(event);
       i++;

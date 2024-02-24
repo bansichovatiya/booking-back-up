@@ -98,26 +98,27 @@ export class GncEventModalComponent implements OnInit {
   validateEvent() {
     let startTag = this.event.meta.bookingType == this.bookingTypeList[1] ? "Start" : 'Pick up';
     let endTag = this.event.meta.bookingType == this.bookingTypeList[1] ? "End" : 'Return';
-    if (this.endTime) {
-      if(this.event.meta.bookingType != this.bookingTypeList[1]){
-        let timeString1 = '11:00';
-        let timeString2 = '19:00';
-        let time1 = new Date('1970-01-01T' + timeString1);
-        let time2 = new Date('1970-01-01T' + timeString2);
-        let time3 = new Date('1970-01-01T' + this.endTime);
-        if (time3 >= time1 && time3 <= time2) {
-        }
-        else {
-          this.showError('Return time should be within 11 AM to 07 PM.');
-          return false;
-        }
-      }
-    }
-    else {
-      let value = this.event.meta.bookingType == this.bookingTypeList[1] ? "End" : 'Return';
-      this.showError( value + ' time is missing');
-      return false;
-    }
+    
+    // if (this.endTime) {
+    //   if(this.event.meta.bookingType != this.bookingTypeList[1]){
+    //     let timeString1 = '11:00';
+    //     let timeString2 = '19:00';
+    //     let time1 = new Date('1970-01-01T' + timeString1);
+    //     let time2 = new Date('1970-01-01T' + timeString2);
+    //     let time3 = new Date('1970-01-01T' + this.endTime);
+    //     if (time3 >= time1 && time3 <= time2) {
+    //     }
+    //     else {
+    //       this.showError('Return time should be within 11 AM to 07 PM.');
+    //       return false;
+    //     }
+    //   }
+    // }
+    // else {
+    //   let value = this.event.meta.bookingType == this.bookingTypeList[1] ? "End" : 'Return';
+    //   this.showError( value + ' time is missing');
+    //   return false;
+    // }
 
     // For GNC Basement Hall start and end date will same.
     if(this.event.meta.bookingType == this.bookingTypeList[1] && !isSameDay(this.event.start, this.event.end)){
@@ -177,6 +178,12 @@ export class GncEventModalComponent implements OnInit {
         else if (this.event.meta.bookingType == this.bookingTypeList[1]) {
           if (!this.event.meta.purpose) {
             this.showError('Purpose is missing.');
+          }
+          else if (this.event.meta.equipments.length == 0) {
+            this.showError('Please select the appropriate option in Equipments.');
+          }
+          else if (this.event.meta.isFixedSetup == null) {
+            this.showError('Please select the appropriate option in Fixed Setup.');
           }
           else {
             isValidData = true;

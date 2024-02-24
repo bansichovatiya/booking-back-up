@@ -102,16 +102,13 @@
                 </div>
             </ng-container>
 
-            <!-- GNC Basement Hall -->
-            <ng-container *ngIf="event.meta.bookingType == bookingTypeList[1]">
+            <!-- Only Laptop & GNC Basement Hall -->
+            <ng-container *ngIf="event.meta.bookingType == bookingTypeList[0] || event.meta.bookingType == bookingTypeList[1]">
                 <div class="input-group input-group-sm mb-3">
-                    <label for="purpose" class="input-group-text">Purpose*</label>
+                    <label *ngIf="event.meta.bookingType == bookingTypeList[0]" for="purpose" class="input-group-text">Purpose</label>
+                    <label *ngIf="event.meta.bookingType == bookingTypeList[1]" for="purpose" class="input-group-text">Purpose*</label>
                     <input type="text" required class="form-control" id="purpose" [(ngModel)]="event.meta.purpose" [disabled]="action == 'view'">
                 </div>
-            </ng-container>
-
-            <!-- Only Laptop -->
-            <ng-container *ngIf="event.meta.bookingType == bookingTypeList[0]">
                 <div class="input-group input-group-sm mb-3" aria-required="true">
                     <label class="input-group-text">Equipment*</label>
                     <ng-multiselect-dropdown class="fmultiselect"
@@ -120,6 +117,18 @@
                         [data]="equipments"
                         [(ngModel)]="event.meta.equipments"
                         [disabled]="action == 'view'"></ng-multiselect-dropdown>
+                </div>
+            </ng-container>
+
+            <!-- GNC Basement Hall -->
+            <ng-container *ngIf="event.meta.bookingType == bookingTypeList[1]">
+                <div class="input-group input-group-sm mb-3" aria-required="true">
+                    <label class="input-group-text">Fixed Setup*</label>
+                    <select class="form-select" [(ngModel)]="event.meta.isFixedSetup" required [disabled]="action == 'view'">
+                        <option disabled selected value="">Select</option>
+                        <option [ngValue]="true">Yes</option>
+                        <option [ngValue]="false">No</option>
+                    </select>
                 </div>
             </ng-container>
         </ng-container>
