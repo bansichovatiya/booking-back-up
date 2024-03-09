@@ -100,9 +100,15 @@
                     <label for="otherPurpose" class="input-group-text">Other Purpose*</label>
                     <input type="text" required class="form-control" id="otherPurpose" [(ngModel)]="event.meta.otherPurpose" [disabled]="action == 'view'">
                 </div>
+                <div class="input-group input-group-sm mb-3" *ngIf="event.meta.setUp == gncSetUpList[1]">
+                    <label for="sendEmail" class="input-group-text">Send Email</label>
+                    <div class="input-group-text">
+                      <input class="form-check-input mt-0" type="checkbox" [(ngModel)]="event.meta.sendEmail" [disabled]="action == 'view'">
+                    </div>
+                </div>
             </ng-container>
 
-            <!-- Only Laptop & GNC Basement Hall -->
+            <!-- Only Laptop [0] & GNC Basement Hall [1]-->
             <ng-container *ngIf="event.meta.bookingType == bookingTypeList[0] || event.meta.bookingType == bookingTypeList[1]">
                 <div class="input-group input-group-sm mb-3">
                     <label *ngIf="event.meta.bookingType == bookingTypeList[0]" for="purpose" class="input-group-text">Purpose</label>
@@ -110,7 +116,8 @@
                     <input type="text" required class="form-control" id="purpose" [(ngModel)]="event.meta.purpose" [disabled]="action == 'view'">
                 </div>
                 <div class="input-group input-group-sm mb-3" aria-required="true">
-                    <label class="input-group-text">Equipment*</label>
+                    <label class="input-group-text" *ngIf="event.meta.bookingType == bookingTypeList[0]">Equipment*</label>
+                    <label class="input-group-text" *ngIf="event.meta.bookingType == bookingTypeList[1]">Equipment</label>
                     <ng-multiselect-dropdown class="fmultiselect"
                         [settings]="singleSelectEquipmentsDropdownSettings"
                         [placeholder]="'Select Equipments'"

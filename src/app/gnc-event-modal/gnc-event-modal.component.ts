@@ -36,15 +36,11 @@ export class GncEventModalComponent implements OnInit {
   equipmentsDropdownSettings = {
     singleSelection: false,
     allowSearchFilter: true,
-    // idField: 'ID',
-    // textField: 'Name',
   };
   singleSelectEquipmentsDropdownSettings = {
     singleSelection: false,
     allowSearchFilter: true,
     enableCheckAll: false,
-    // idField: 'ID',
-    // textField: 'Name',
   };
 
   constructor(
@@ -178,9 +174,6 @@ export class GncEventModalComponent implements OnInit {
         else if (this.event.meta.bookingType == this.bookingTypeList[1]) {
           if (!this.event.meta.purpose) {
             this.showError('Purpose is missing.');
-          }
-          else if (this.event.meta.equipments.length == 0) {
-            this.showError('Please select the appropriate option in Equipments.');
           }
           else if (this.event.meta.isFixedSetup == null) {
             this.showError('Please select the appropriate option in Fixed Setup.');

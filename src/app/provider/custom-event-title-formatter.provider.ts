@@ -15,12 +15,13 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
     let endDate = event.end != null ? "End - " + formatDate(event.end, 'dd-MM-yyyy hh:mm a', this.locale) : '';
     let data  = event.meta.bookingType == 'Activity Booking'? `${event.meta.setUp}<br>
                   ${event.meta.eventPlace == 'Other' ? 'Other - '+ event.meta.otherPlace : event.meta.eventPlace}` : '';
-    let items = event.meta.equipments.filter(x=> x.includes("Laptop")).join('</br>');
+    let laptopItems = event.meta.equipments.filter(x=> x.includes("Laptop"));
+    let items = laptopItems.length == 0 ? '': laptopItems.join(', ') + '<br>';
     return `<b>${event.title}</b> (${event.meta.bookingType})<br>
+            ${items}
             ${startDate}<br>
             ${endDate}<br>
-            ${data}<br>
-            ${items}`;
+            ${data}`;
   }
 
   day(event: CalendarEvent): string {
@@ -28,11 +29,11 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
     let endDate = event.end != null ? "End - " + formatDate(event.end, 'dd-MM-yyyy hh:mm a', this.locale) : '';
     let data  = event.meta.bookingType == 'Activity Booking'? `${event.meta.setUp}<br>
                   ${event.meta.eventPlace == 'Other' ? 'Other - '+ event.meta.otherPlace : event.meta.eventPlace}` : '';
-    let items = event.meta.equipments.filter(x=> x.includes("Laptop")).join('</br>');
-    return `<b>${event.title}</b> (${event.meta.bookingType})<br>
+    let laptopItems = event.meta.equipments.filter(x=> x.includes("Laptop"));
+    let items = laptopItems.length == 0 ? '': '- ' + laptopItems.join(', ');
+    return `<b>${event.title}</b> (${event.meta.bookingType}) ${items}<br>
             ${startDate}<br>
             ${endDate}<br>
-            ${data}<br>
-            ${items}`;
+            ${data}`;
   }
 }

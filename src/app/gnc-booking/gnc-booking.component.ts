@@ -135,7 +135,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       this.listDetials = [];
       if (this.bookingDetails.length > 0) {
         this.bookingDetails.forEach((element) => {
-          let equpiments: string[] = element.Equipments ? element.Equipments.split(',') : [];
+          let equipments: string[] = element.Equipments ? element.Equipments.split(',') : [];
           let currentDate = new Date();
           let event: CalendarEvent<any> = {
             id: element.bdid,
@@ -149,11 +149,12 @@ export class GncBookingComponent implements OnInit, OnDestroy {
               setUp: element.SetUp,
               eventPlace: element.EventPlace,
               otherPlace: element.OtherPlace,
-              equipments: equpiments,
+              equipments: equipments,
               otherRequirements: element.OtherRequirments,
               purpose: element.Purpose,
               otherPurpose: element.OtherPurpose,
               isFixedSetup: element.IsFixedSetup,
+              sendEmail: element.SendEmail,
               ispast: (new Date(element.Etime) > currentDate ? false : true)
             },
           }
@@ -262,7 +263,8 @@ export class GncBookingComponent implements OnInit, OnDestroy {
           otherRequirements: null,
           purpose: null,
           otherPurpose: null,
-          isFixedSetup: null
+          isFixedSetup: null,
+          sendEmail: false
         },
       }
   
