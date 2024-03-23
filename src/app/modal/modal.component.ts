@@ -20,7 +20,7 @@ export class ModalComponent implements OnInit {
   @Input() startHour;
   validationmsg: any;
 
-  constructor(public activeModal: NgbActiveModal, private bookinService: BookingService) { }
+  constructor(public activeModal: NgbActiveModal) { }
 
   ngOnInit(): void {
     this.startTime = (this.event.start.getHours().toString().length == 1 ? '0' + this.event.start.getHours() : this.event.start.getHours())
@@ -78,10 +78,6 @@ export class ModalComponent implements OnInit {
 
       case 'delete':
         this.activeModal.close('delete');
-        this.bookinService.DeleteBookingDetails(
-          this.event.id)
-          .subscribe((data) => {
-          });
         break;
     }
   }

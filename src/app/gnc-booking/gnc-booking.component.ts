@@ -70,7 +70,7 @@ export class GncBookingComponent implements OnInit, OnDestroy {
   allPurposeList: any[];
 
   constructor(private modalService: NgbModal,
-    private bookinService: BookingService,
+    private bookingService: BookingService,
     private cd: ChangeDetectorRef,
     private route: ActivatedRoute,
     @Inject(LOCALE_ID) private locale: string,
@@ -83,27 +83,31 @@ export class GncBookingComponent implements OnInit, OnDestroy {
   }
 
   async getGNCBookingTypeData(){
-    await this.bookinService.GetGNCBookingType().subscribe((data: any[]) => {
-      this.allEventPlaces = data.filter(x => x.Detail == "EventPlaces");
-      this.allEquipments = data.filter(x => x.Detail == "Equipments");
-      this.allPurposeList = data.filter(x => x.Detail == "Purpose");
+    await this.bookingService.GetGNCBookingType().subscribe((data: any[]) => {
+      if (data && data.length > 0) {
+        this.allEventPlaces = data.filter(x => x.Detail == "EventPlaces");
+        this.allEquipments = data.filter(x => x.Detail == "Equipments");
+        this.allPurposeList = data.filter(x => x.Detail == "Purpose");
+      }
     });
   }
 
   async getBookingType() {
-    await this.bookinService.GetBookingType('', this.category).subscribe((data) => {
-      this.types = data;
-      if (this.types.length > 0) {
-        this.selectedType = this.types[0].Type;
-        this.OnTypeChange(this.selectedType);
+    await this.bookingService.GetBookingType('', this.category).subscribe((data) => {
+      if (data && data.length > 0) {
+        this.types = data;
+        if (this.types.length > 0) {
+          this.selectedType = this.types[0].Type;
+          this.OnTypeChange(this.selectedType);
+        }
       }
     });
 
   }
 
   async OnTypeChange(type) {
-    await this.bookinService.GetBookingType(type, this.category).subscribe((data: any[]) => {
-      if(data.length > 0){
+    await this.bookingService.GetBookingType(type, this.category).subscribe((data: any[]) => {
+      if(data && data.length > 0){
         data.forEach((element) => {
           this.eventTypes.push(element);
         });
@@ -130,10 +134,10 @@ export class GncBookingComponent implements OnInit, OnDestroy {
   async getBookingDetails() {
     // Required all events for filter event place and equipments in modal and to show by selected type from dropdown.
     let ItemId = this.eventTypes.find((t: { Name: any; }) => t.Name == this.selectedName).Itid;
-    await this.bookinService.GetGNCBookingDetails('0').subscribe((data) => {
-      this.bookingDetails = data;
-      this.listDetials = [];
-      if (this.bookingDetails.length > 0) {
+    await this.bookingService.GetGNCBookingDetails('0').subscribe((data) => {
+      if (data && data.length > 0) {
+        this.bookingDetails = data;
+        this.listDetials = [];
         this.bookingDetails.forEach((element) => {
           let equipments: string[] = element.Equipments ? element.Equipments.split(',') : [];
           let currentDate = new Date();
@@ -292,14 +296,17 @@ export class GncBookingComponent implements OnInit, OnDestroy {
 
     modalRef.result.then((result) => {
       if (result == 'delete') {
-        this.eventsByItemId = this.eventsByItemId.filter((e) => e !== event);
-        this.events = this.events.filter((e) => e !== event);
         if (event.id) {
           let eventData = new EventData(event);
-          this.listDetials = this.listDetials.filter((e) => e.id !== event.id);
-          this.refreshZingGrid();
-          this.bookinService.DeleteGNCBookingDetails(eventData)
+          this.bookingService.DeleteGNCBookingDetails(eventData)
             .subscribe((data) => {
+              if(data) {
+                this.eventsByItemId = this.eventsByItemId.filter((e) => e !== event);
+                this.events = this.events.filter((e) => e !== event);
+                this.listDetials = this.listDetials.filter((e) => e.id !== event.id);
+                this.refreshZingGrid();
+                this.cd.detectChanges();
+              }
             });
         }
       }
@@ -316,44 +323,49 @@ export class GncBookingComponent implements OnInit, OnDestroy {
       else if (result && action == 'add') {
         let eventData = new EventData(result);
         eventData["department"] = this.getDepartmentbyItemID(Number(eventData.itemid));
-        this.bookinService.InsertGNCBookingDetails(eventData)
+        this.bookingService.InsertGNCBookingDetails(eventData)
           .subscribe((data: EventData[]) => {
-            if (data && data.length > 0) {
+            if (data && data.length > 0 && data[0].bdid) {
               result.id = data[0].bdid;
+              this.eventsByItemId = [
+                ...this.eventsByItemId,
+                result,
+              ];
+              this.events = [
+                ...this.events,
+                result,
+              ];
+              this.refresh.next();
               let updatedval = this.flattenMeta(result);
               this.listDetials.unshift(updatedval);
               this.refreshZingGrid();
+              this.cd.detectChanges();
             }
           });
-        this.eventsByItemId = [
-          ...this.eventsByItemId,
-          result,
-        ];
-        this.events = [
-          ...this.events,
-          result,
-        ];
       }
       else if (result && action == 'edit') {
-        event.title = result.title;
-        event.start = result.start;
-        event.end = result.end;
-        event.meta = result.meta;
         let eventData = new EventData(result);
-        let updatedval = this.flattenMeta(event);
-        const indexToReplace = this.listDetials.findIndex(item => item.id === updatedval.id);
-        if (indexToReplace !== -1) {
-          this.listDetials[indexToReplace] = updatedval;
-        }
-        this.refresh.next();
-        this.refreshZingGrid();
-        this.bookinService.UpdateGNCBookingDetails(eventData)
+        this.bookingService.UpdateGNCBookingDetails(eventData)
           .subscribe((data) => {
-            this.cd.detectChanges();
+            if (data) {
+              event.title = result.title;
+              event.start = result.start;
+              event.end = result.end;
+              event.meta = result.meta;
+              this.refresh.next();
+              let updatedval = this.flattenMeta(event);
+              const indexToReplace = this.listDetials.findIndex(item => item.id === updatedval.id);
+              if (indexToReplace !== -1) {
+                this.listDetials[indexToReplace] = updatedval;
+              }
+              this.refreshZingGrid();
+              this.cd.detectChanges();
+            }
           });
       }
 
       this.refresh.next();
+      this.refreshZingGrid();
       this.cd.detectChanges();
       if (this.view == this.viewList) {
         this.cd.detectChanges();

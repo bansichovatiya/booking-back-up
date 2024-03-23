@@ -58,7 +58,7 @@ export class BookingComponent implements OnInit, OnDestroy {
     weekStartsOn: 1 // Monday is the first day of the week
   };
   constructor(private modalService: NgbModal,
-    private bookinService: BookingService,
+    private bookingService: BookingService,
     private cd: ChangeDetectorRef,
     private route: ActivatedRoute,
     private excelExportService: IgxExcelExporterService,
@@ -83,25 +83,26 @@ export class BookingComponent implements OnInit, OnDestroy {
   async getBookingType() {
     let catParam = this.route.snapshot.routeConfig.path;
     this.category = ((catParam.includes('oldsankul') && catParam == '@oldsankul1958') ? 'Old Sankul' : (catParam.includes('newsankul') && catParam == '@newsankul1968') ? 'New Sankul' : 'All');
-    await this.bookinService.GetBookingType('', this.category).subscribe((data) => {
-      this.types = data;
-      if (this.types.length > 0) {
+    await this.bookingService.GetBookingType('', this.category).subscribe((data) => {
+      if (data && data.length > 0) {
+        this.types = data;
         this.selectedType = this.types[0].Type;
         this.OnTypeChange(this.selectedType);
       }
     });
-
   }
 
   async OnTypeChange(type) {
-    await this.bookinService.GetBookingType(type, this.category).subscribe((data) => {
-      this.eventTypes = data;
-      this.starthour = this.eventTypes[0].StartHour;
-      this.selectedItemId = this.eventTypes[0].Itid;
-      this.selectedName = this.eventTypes[0].Name;
-      this.selectedColor = this.eventTypes[0].Color;
-      this.events = [];
-      this.getBookingDetails();
+    await this.bookingService.GetBookingType(type, this.category).subscribe((data) => {
+      if (data && data.length > 0) {
+        this.eventTypes = data;
+        this.starthour = this.eventTypes[0].StartHour;
+        this.selectedItemId = this.eventTypes[0].Itid;
+        this.selectedName = this.eventTypes[0].Name;
+        this.selectedColor = this.eventTypes[0].Color;
+        this.events = [];
+        this.getBookingDetails();
+      }
     });
   }
 
@@ -116,9 +117,9 @@ export class BookingComponent implements OnInit, OnDestroy {
   async getBookingDetails() {
     let ItemId = this.eventTypes.find(t => t.Name == this.selectedName).Itid;
     // let date = moment(this.viewDate).format('YYYY-MM-DD');
-    await this.bookinService.GetBookingDetails(ItemId).subscribe((data) => {
-      this.bookingDetails = data;
-      if (this.bookingDetails.length > 0) {
+    await this.bookingService.GetBookingDetails(ItemId).subscribe((data) => {
+      if (data && data.length > 0) {
+        this.bookingDetails = data;
         this.bookingDetails.forEach(element => {
           let event: CalendarEvent<{ "ItemId": number }> = {
             id: element.bdid,
@@ -217,8 +218,13 @@ export class BookingComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.startHour = this.starthour;
     modalRef.result.then((result) => {
       if (result == 'delete') {
-        this.events = this.events.filter((e) => e !== event);
-        this.refresh.next();
+        this.bookingService.DeleteBookingDetails(event.id)
+          .subscribe((data) => {
+            if(data) {
+              this.events = this.events.filter((e) => e !== event);
+            this.refresh.next();
+            }
+          });
       }
       else if (result && action == 'add') {
         let calendarEventTimesChangedEvent: CalendarEventTimesChangedEvent = {
@@ -231,21 +237,20 @@ export class BookingComponent implements OnInit, OnDestroy {
          
           let stime = moment(result.start).format('YYYY-MM-DD HH:mm:ss');
           let etime = moment(result.end).format('YYYY-MM-DD HH:mm:ss');
-          this.bookinService.InsertBookingDetails(
-            result.title,
-            stime,
-            etime,
-            result.meta.ItemId)
+          this.bookingService.InsertBookingDetails(result.title, stime, etime, result.meta.ItemId)
             .subscribe((data) => {
-              this.events = [
-                ...this.events,
-                result,
-              ];
-              this.refresh.next();
+              if (data && data.length > 0 && data[0].bdid) {
+                result.id = data[0].bdid;
+                this.events = [
+                  ...this.events,
+                  result,
+                ];
+                this.refresh.next();
+              }
             });
         }
         else {
-          this.addAlertMessage("danger", "overlappingEvent");
+          alert("Conflicts with existing booking.");
         }
         this.refresh.next();
       }
@@ -257,24 +262,20 @@ export class BookingComponent implements OnInit, OnDestroy {
           newEnd: result.end
         }
         if (this.validateEventTimesChanged(calendarEventTimesChangedEvent, result.meta.ItemId)) {
-          event.title = result.title;
-          event.start = result.start;
-          event.end = result.end;
-          this.refresh.next();
           let stime = moment(result.start).format('YYYY-MM-DD HH:mm:ss');
           let etime = moment(result.end).format('YYYY-MM-DD HH:mm:ss');
-          this.bookinService.UpdateBookingDetails(
-            result.title,
-            stime,
-            etime,
-            result.meta.ItemId,
-            result.id)
+          this.bookingService.UpdateBookingDetails(result.title, stime, etime, result.meta.ItemId, result.id)
             .subscribe((data) => {
+              if(data) {
+                event.title = result.title;
+                event.start = result.start;
+                event.end = result.end;
+                this.refresh.next();
+              }
             });
         }
         else {
-          this.addAlertMessage("danger", "overlappingEvent");
-          this.refresh.next();
+          alert("Conflicts with existing booking.");
         }
       }
     },
@@ -313,17 +314,20 @@ export class BookingComponent implements OnInit, OnDestroy {
     newStart,
     newEnd,
   }: CalendarEventTimesChangedEvent): void {
-    event.start = newStart;
-    event.end = newEnd;
-    this.bookinService.UpdateBookingDetails(
+    
+    this.bookingService.UpdateBookingDetails(
       event.title,
-      moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
-      moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
+      moment(newStart).format('YYYY-MM-DD HH:mm:ss'),
+      moment(newEnd).format('YYYY-MM-DD HH:mm:ss'),
       event.meta.ItemId,
       event.id.toString())
       .subscribe((data) => {
+        if(data) {
+          event.start = newStart;
+          event.end = newEnd;
+          this.refresh.next();
+        }
       });
-    this.refresh.next();
   }
 
   public exportData() {
