@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy, Chang
 import { ActivatedRoute } from '@angular/router';
 import { NgbAlert, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarDateFormatter, CalendarEvent, CalendarEventTimesChangedEvent, CalendarEventTimesChangedEventType, CalendarMonthViewComponent, CalendarView, CalendarWeekViewComponent } from 'angular-calendar';
-import { addMinutes, isSameDay, startOfMinute } from 'date-fns';
+import { addDays, addMinutes, isSameDay, startOfMinute } from 'date-fns';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { Cloneable } from '../helper/cloneable';
@@ -47,6 +47,7 @@ export class BookingComponent implements OnInit, OnDestroy {
   isrepeat: boolean = false;
   bookingDetails: any;
   daysInWeek = 7;
+  excludeDays: number[] = [];
   category: any;
   starthour: any = 8;
   private destroy$ = new Subject<void>();
@@ -93,6 +94,19 @@ export class BookingComponent implements OnInit, OnDestroy {
   }
 
   async OnTypeChange(type) {
+    // exclude sunday when type is Vehicle.
+    if (type == "Vehicle"){
+      this.excludeDays.push(0);
+      if (this.view == CalendarView.Day && this.viewDate.getDay() == 0){
+        this.viewDate = addDays(this.viewDate, 1);
+      }
+    }
+    else if (this.excludeDays.length){
+      this.excludeDays.length = 0;
+    }
+
+    this.refresh.next();
+
     await this.bookingService.GetBookingType(type, this.category).subscribe((data) => {
       if (data && data.length > 0) {
         this.eventTypes = data;

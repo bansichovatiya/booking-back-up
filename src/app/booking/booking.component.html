@@ -7,13 +7,13 @@
 
     <div class="col-md-2 col-lg-1 justify-content-md-end">
       <div class="btn-group">
-        <div class="btn btn-sm btn-outline-secondary" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate">
+        <div class="btn btn-sm btn-outline-secondary" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate" [excludeDays]="excludeDays">
           ❮
         </div>
         <div class="btn btn-sm btn-outline-secondary" mwlCalendarToday [(viewDate)]="viewDate">
           Today
         </div>
-        <div class="btn btn-sm btn-outline-secondary" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate">
+        <div class="btn btn-sm btn-outline-secondary" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate" [excludeDays]="excludeDays">
           ❯
         </div>
       </div>
@@ -66,19 +66,19 @@
     <div class="week-view-container" style="overflow-x: auto;">
       <mwl-calendar-month-view #monthView (dayClicked)="dayClicked($event.day)" *ngSwitchCase="CalendarView.Month"
         [viewDate]="viewDate" [events]="events" [refresh]="refresh" (eventClicked)="eventClicked($event)"
-        (eventTimesChanged)="eventTimesChanged($event)">
+        (eventTimesChanged)="eventTimesChanged($event)" [excludeDays]="excludeDays">
       </mwl-calendar-month-view>
       <mwl-calendar-week-view #weekView *ngSwitchCase="CalendarView.Week" [viewDate]="viewDate" [events]="events"
         [refresh]="refresh" (eventClicked)="eventClicked($event)"
         [validateEventTimesChanged]="validateEventTimesChanged" (dayHeaderClicked)="dayClicked($event.day)"
         (hourSegmentClicked)="hourSegmentClicked($event.date)" (eventTimesChanged)="eventTimesChanged($event)"
-        [dayStartHour]="starthour" [dayEndHour]="24">
+        [dayStartHour]="starthour" [dayEndHour]="24" [excludeDays]="excludeDays">
       </mwl-calendar-week-view>
     </div>
     <mwl-calendar-day-view *ngSwitchCase="CalendarView.Day" [viewDate]="viewDate" [events]="events" [refresh]="refresh"
       (eventClicked)="eventClicked($event)" [validateEventTimesChanged]="validateEventTimesChanged" [hourSegments]="2"
       (hourSegmentClicked)="hourSegmentClicked($event.date)" (eventTimesChanged)="eventTimesChanged($event)"
-      [dayStartHour]="starthour" [dayEndHour]="24">
+      [dayStartHour]="starthour" [dayEndHour]="24" [excludeDays]="excludeDays">
     </mwl-calendar-day-view>
   </div>
 </div>
