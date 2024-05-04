@@ -2,7 +2,6 @@ import { Component, OnInit, Input, ViewEncapsulation, ChangeDetectorRef } from '
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarEvent } from 'angular-calendar';
 import * as moment from 'moment';
-import * as data from '../../assets/json/data.json';
 import { isSameDay } from 'date-fns';
 
 @Component({
@@ -29,7 +28,7 @@ export class GncEventModalComponent implements OnInit {
   validationmsg: any;
   bookingTypeList: string[] = ["Only Laptop", "GNC Basement Hall", "Activity Booking"];
   gncSetUpList: string[] = ["Fixed Setup", "Portable Setup"];
-  jsonData: any = (data as any).default;
+  jsonData: any;
   eventPlaces: any[] = [];
   equipments: any[] = [];
   purposeList: any[] = [];

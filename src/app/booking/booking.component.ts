@@ -345,21 +345,44 @@ export class BookingComponent implements OnInit, OnDestroy {
   }
 
   public exportData() {
+    let catParam = this.route.snapshot.routeConfig.path;
     let fileName = "BookingDetails_" + this.selectedType + "_" + this.selectedName;
     let exportDataList = [];
-    let i = 1;
-    this.events.forEach(element => {
-      let event = {
-        'Sr No': i,
-        'Person Name': element.title,
-        'Date': moment(element.start).format('DD-MM-YYYY'),
-        'Start Time': moment(element.start).format('hh:mm A'),
-        'End Time': moment(element.end).format('hh:mm A'),
-      }
-      exportDataList.push(event);
-      i++;
-    });
-    this.excelExportService.exportData(exportDataList, new IgxExcelExporterOptions(fileName));
+    if (catParam.includes('oldsankul')) {
+      this.bookingService.GetSankulBookingDetails().subscribe((data: any) => {
+        let i = 1;
+        data.forEach(element => {
+          let event = {
+            'Sr No': i,
+            'Type': element.Type,
+            'Name': element.Name,
+            'Person Name': element.Person_Name,
+            'Date': moment(element.Stime).format('DD-MM-YYYY'),
+            'Start Time': moment(element.Stime).format('hh:mm A'),
+            'End Time': moment(element.Etime).format('hh:mm A'),
+          }
+          exportDataList.push(event);
+          i++;
+        });
+        this.excelExportService.exportData(exportDataList, new IgxExcelExporterOptions("Sankul_BookingDetails"));
+      });
+    }
+    else {
+      let i = 1;
+      this.events.forEach(element => {
+        let event = {
+          'Sr No': i,
+          'Person Name': element.title,
+          'Date': moment(element.start).format('DD-MM-YYYY'),
+          'Start Time': moment(element.start).format('hh:mm A'),
+          'End Time': moment(element.end).format('hh:mm A'),
+        }
+        exportDataList.push(event);
+        i++;
+      });
+      this.excelExportService.exportData(exportDataList, new IgxExcelExporterOptions(fileName));
+    }
+
   }
 
   ngOnDestroy() {
