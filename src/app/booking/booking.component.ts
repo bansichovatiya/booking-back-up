@@ -94,8 +94,17 @@ export class BookingComponent implements OnInit, OnDestroy {
   }
 
   async OnTypeChange(type) {
-    // exclude sunday when type is Vehicle.
-    if (type == "Vehicle"){
+    await this.bookingService.GetBookingType(type, this.category).subscribe((data) => {
+      if (data && data.length > 0) {
+        this.eventTypes = data;
+        this.onChange(this.eventTypes[0].Name);
+      }
+    });
+  }
+
+  onChange(name) {
+    // exclude sunday when type is Vehicle and 7279(White).
+    if (this.selectedType == "Vehicle" && name == "7279(White)"){
       this.excludeDays.push(0);
       if (this.view == CalendarView.Day && this.viewDate.getDay() == 0){
         this.viewDate = addDays(this.viewDate, 1);
@@ -107,21 +116,8 @@ export class BookingComponent implements OnInit, OnDestroy {
 
     this.refresh.next();
 
-    await this.bookingService.GetBookingType(type, this.category).subscribe((data) => {
-      if (data && data.length > 0) {
-        this.eventTypes = data;
-        this.starthour = this.eventTypes[0].StartHour;
-        this.selectedItemId = this.eventTypes[0].Itid;
-        this.selectedName = this.eventTypes[0].Name;
-        this.selectedColor = this.eventTypes[0].Color;
-        this.events = [];
-        this.getBookingDetails();
-      }
-    });
-  }
-
-  onChange(name) {
     this.selectedName = name;
+    this.starthour = this.eventTypes.find(t => t.Name == name).StartHour;
     this.selectedColor = this.eventTypes.find(t => t.Name == name).Color;
     this.selectedItemId = this.eventTypes.find(t => t.Name == name).Itid;
     this.events = [];
